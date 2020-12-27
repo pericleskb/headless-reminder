@@ -36,6 +36,7 @@ class SoundPlayingService: Service() {
             prepare()
             start()
             setOnCompletionListener {
+                it.reset()
                 it.release()
                 stopSelf()
             }
