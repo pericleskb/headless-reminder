@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Headless Reminder</string>
+    <string name="num_of_alarms">Reminders per day</string>
+    <string name="set_alarms">Set alarms</string>
+</resources>
