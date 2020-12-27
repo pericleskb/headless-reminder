@@ -62,15 +62,15 @@ class DashboardFragment: Fragment() {
         }
         val calendar: Calendar = Calendar.getInstance().apply {
             timeInMillis = System.currentTimeMillis()
-            set(Calendar.HOUR_OF_DAY, 18)
-            set(Calendar.MINUTE, 49
+            set(Calendar.HOUR_OF_DAY, 19)
+            set(Calendar.MINUTE, 20
             )
         }
 
         alarmMgr?.setInexactRepeating(
             AlarmManager.RTC,
             calendar.timeInMillis,
-            AlarmManager.INTERVAL_FIFTEEN_MINUTES/15,
+            AlarmManager.INTERVAL_HALF_HOUR,
             alarmIntent
         )
     }
