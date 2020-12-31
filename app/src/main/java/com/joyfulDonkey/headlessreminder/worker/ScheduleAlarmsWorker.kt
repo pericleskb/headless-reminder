@@ -1,14 +1,13 @@
 package com.joyfulDonkey.headlessreminder.worker
 
 import android.content.Context
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkRequest
-import androidx.work.Worker
-import androidx.work.WorkerParameters
+import androidx.work.*
 import com.joyfulDonkey.headlessreminder.data.alarm.AlarmSchedulerProperties
 import com.joyfulDonkey.headlessreminder.util.AlarmScheduler.AlarmSchedulerUtils
+import java.util.concurrent.TimeUnit
 
-class ScheduleAlarmsWorker(appContext: Context, workerParameters: WorkerParameters)
+//TODO if we need this to run at a specific time then we should use ScheduleAlarmService
+class ScheduleAlarmsWorker(private val appContext: Context, workerParameters: WorkerParameters)
     : Worker(appContext, workerParameters) {
 
     companion object {
@@ -16,17 +15,27 @@ class ScheduleAlarmsWorker(appContext: Context, workerParameters: WorkerParamete
     }
 
     override fun doWork(): Result {
-        val alarmProperties: AlarmSchedulerProperties =
-            inputData.keyValueMap[ALARM_PROPERTIES_BUNDLE] as AlarmSchedulerProperties
+        var alarmProperties: AlarmSchedulerProperties = AlarmSchedulerProperties()
+        if (!inputData.keyValueMap.containsKey(ALARM_PROPERTIES_BUNDLE)) {
+            //TODO remove else and testing case
+//            return Result.failure()
+        } else {
+            alarmProperties =
+                inputData.keyValueMap[ALARM_PROPERTIES_BUNDLE] as AlarmSchedulerProperties
+        }
         val alarmIntervals = AlarmSchedulerUtils.getAlarmIntervals(alarmProperties)
-        for ((code, alarmInterval) in alarmIntervals.withIndex()) {
-            setUpAlarm(alarmInterval, code)
+        for (alarmInterval in alarmIntervals) {
+            setUpAlarm(alarmInterval)
         }
         return Result.success()
     }
 
 
-    private fun setUpAlarm(triggerAtMillis: Long, requestCode: Int) {
-        val workRequest: WorkRequest = OneTimeWorkRequestBuilder<PlaySoundWorker>().build()
+    private fun setUpAlarm(triggerAtMillis: Int) {
+        //TODO set retry and backoff policy
+        val workRequest: WorkRequest = OneTimeWorkRequestBuilder<PlaySoundWorker>()
+            .setInitialDelay(triggerAtMillis.toLong(), TimeUnit.MILLISECONDS)
+            .build()
+        WorkManager.getInstance(appContext).enqueue(workRequest)
     }
 }

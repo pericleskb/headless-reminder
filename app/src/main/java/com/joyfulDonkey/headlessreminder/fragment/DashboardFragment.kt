@@ -1,27 +1,25 @@
 package com.joyfulDonkey.headlessreminder.fragment
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.SystemClock
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import com.joyfulDonkey.headlessreminder.data.alarm.AlarmSchedulerProperties
 import com.joyfulDonkey.headlessreminder.databinding.FragmentDashboardBinding
 import com.joyfulDonkey.headlessreminder.service.ScheduleAlarmsService
-import com.joyfulDonkey.headlessreminder.service.SoundPlayingService
-import java.util.*
-
+import com.joyfulDonkey.headlessreminder.worker.PlaySoundWorker
+import com.joyfulDonkey.headlessreminder.worker.ScheduleAlarmsWorker
+import java.util.concurrent.TimeUnit
 
 class DashboardFragment: Fragment() {
 
     private lateinit var binding: FragmentDashboardBinding
-    private var alarmMgr: AlarmManager? = null
-    private lateinit var alarmIntent: PendingIntent
 
     /*****************************************************
      * No arguments here but following this practice everywhere
@@ -38,7 +36,7 @@ class DashboardFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     )
-            : View? {
+            : View {
         binding = FragmentDashboardBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
@@ -51,34 +49,21 @@ class DashboardFragment: Fragment() {
     private fun initResources() {
         binding.setAlarmsButton.setOnClickListener {
             setUpAlarmScheduler()
-//            scheduleTodaysAlarms()
+            scheduleTodaysAlarms()
         }
     }
 
     private fun setUpAlarmScheduler() {
-        alarmMgr = activity?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmIntent = Intent(activity, ScheduleAlarmsService::class.java).let { intent ->
-            PendingIntent.getService(activity, 0, intent, 0)
-        }
-        val calendar: Calendar = Calendar.getInstance().apply {
-            timeInMillis = System.currentTimeMillis()
-            set(Calendar.HOUR_OF_DAY, 19)
-            set(Calendar.MINUTE, 20
-            )
-        }
-
-        alarmMgr?.setInexactRepeating(
-            AlarmManager.RTC,
-            calendar.timeInMillis,
-            AlarmManager.INTERVAL_HALF_HOUR,
-            alarmIntent
-        )
+        val scheduleAlarmsWork = PeriodicWorkRequestBuilder<ScheduleAlarmsWorker>(
+            15, TimeUnit.MINUTES,
+            5, TimeUnit.MINUTES)
+            .build()
+        context?.let { WorkManager.getInstance(it).enqueue(scheduleAlarmsWork) }
     }
 
     private fun scheduleTodaysAlarms() {
-        val intent = Intent(activity, ScheduleAlarmsService::class.java)
-        val alarmSchedulerProperties = AlarmSchedulerProperties()
-        intent.putExtra(ScheduleAlarmsService.ALARM_PROPERTIES_BUNDLE, alarmSchedulerProperties)
-        activity?.startService(intent)
+        val workRequest: WorkRequest = OneTimeWorkRequestBuilder<ScheduleAlarmsWorker>()
+            .build()
+        context?.let { WorkManager.getInstance(it).enqueue(workRequest) }
     }
 }
