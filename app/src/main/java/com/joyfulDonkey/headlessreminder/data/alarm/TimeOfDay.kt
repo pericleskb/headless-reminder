@@ -7,4 +7,14 @@ import kotlinx.android.parcel.Parcelize
 data class TimeOfDay(
     val hour: Int,
     val minute: Int
-): Parcelable
+): Parcelable {
+
+    fun isEarlierThan(other: TimeOfDay): Boolean {
+        if (hour < other.hour) {
+            return true
+        } else if (hour == other.hour && minute >= other.minute) {
+            return true
+        }
+        return false
+    }
+}
