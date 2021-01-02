@@ -75,7 +75,6 @@ class AlarmSchedulerUtilsTest {
         val intervalsList: ArrayList<Long> = AlarmSchedulerUtils.getAlarmIntervals(properties)
         intervalsList.sort()
 
-        val evenDistributionMilliseconds = 6 * HOUR_IN_MS / 10
         val minStartInterval = AlarmSchedulerUtils.START_NOW_OFFSET
 
         for (i in 0 until intervalsList.size - 1) {

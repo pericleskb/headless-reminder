@@ -11,9 +11,14 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.IBinder
 import android.os.SystemClock
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import com.joyfulDonkey.headlessreminder.R
 import com.joyfulDonkey.headlessreminder.data.alarm.AlarmSchedulerProperties
 import com.joyfulDonkey.headlessreminder.util.AlarmScheduler.AlarmSchedulerUtils
+import com.joyfulDonkey.headlessreminder.worker.PlaySoundWorker
+import java.util.concurrent.TimeUnit
 
 class ScheduleAlarmsService: Service() {
 
@@ -31,28 +36,22 @@ class ScheduleAlarmsService: Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-        println("@@@ ScheduleAlarmsService - " + SystemClock.elapsedRealtime())
         val alarmProperties: AlarmSchedulerProperties = intent?.getParcelableExtra(
             ALARM_PROPERTIES_BUNDLE) ?: AlarmSchedulerProperties()
         val alarmIntervals = AlarmSchedulerUtils.getAlarmIntervals(alarmProperties)
-        var code: Int = 0
         for (alarmInterval in alarmIntervals) {
-            setUpAlarm(alarmInterval, code++)
+            setUpAlarm(alarmInterval)
         }
         stopSelf()
         return START_REDELIVER_INTENT
     }
 
-    private fun setUpAlarm(triggerAtMillis: Long, requestCode: Int) {
-        //TODO can we use same intent and set up multiple alarms?
-        alarmIntent = Intent(this, SoundPlayingService::class.java).let { intent ->
-            PendingIntent.getService(this, requestCode, intent, 0)
-        }
-        alarmMgr?.set(
-            AlarmManager.ELAPSED_REALTIME_WAKEUP,
-            triggerAtMillis,
-            alarmIntent
-        )
+    private fun setUpAlarm(triggerAtMillis: Long) {
+        //TODO set retry and backoff policy
+        val workRequest: WorkRequest = OneTimeWorkRequestBuilder<PlaySoundWorker>()
+            .setInitialDelay(triggerAtMillis, TimeUnit.MILLISECONDS)
+            .build()
+        WorkManager.getInstance(applicationContext).enqueue(workRequest)
     }
 
     override fun onBind(intent: Intent?): IBinder? {

@@ -25,6 +25,7 @@ class ScheduleAlarmsWorker(private val appContext: Context, workerParameters: Wo
         }
         val alarmIntervals = AlarmSchedulerUtils.getAlarmIntervals(alarmProperties)
         for (alarmInterval in alarmIntervals) {
+            println("@@@ - interval - $alarmInterval")
             setUpAlarm(alarmInterval)
         }
         return Result.success()
@@ -34,7 +35,7 @@ class ScheduleAlarmsWorker(private val appContext: Context, workerParameters: Wo
     private fun setUpAlarm(triggerAtMillis: Long) {
         //TODO set retry and backoff policy
         val workRequest: WorkRequest = OneTimeWorkRequestBuilder<PlaySoundWorker>()
-            .setInitialDelay(triggerAtMillis.toLong(), TimeUnit.MILLISECONDS)
+            .setInitialDelay(triggerAtMillis, TimeUnit.MILLISECONDS)
             .build()
         WorkManager.getInstance(appContext).enqueue(workRequest)
     }

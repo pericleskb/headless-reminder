@@ -1,6 +1,5 @@
 package com.joyfulDonkey.headlessreminder.fragment
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,10 +9,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import com.joyfulDonkey.headlessreminder.data.alarm.AlarmSchedulerProperties
 import com.joyfulDonkey.headlessreminder.databinding.FragmentDashboardBinding
-import com.joyfulDonkey.headlessreminder.service.ScheduleAlarmsService
-import com.joyfulDonkey.headlessreminder.worker.PlaySoundWorker
 import com.joyfulDonkey.headlessreminder.worker.ScheduleAlarmsWorker
 import java.util.concurrent.TimeUnit
 
