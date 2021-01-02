@@ -31,7 +31,7 @@ class ScheduleAlarmsWorker(private val appContext: Context, workerParameters: Wo
     }
 
 
-    private fun setUpAlarm(triggerAtMillis: Int) {
+    private fun setUpAlarm(triggerAtMillis: Long) {
         //TODO set retry and backoff policy
         val workRequest: WorkRequest = OneTimeWorkRequestBuilder<PlaySoundWorker>()
             .setInitialDelay(triggerAtMillis.toLong(), TimeUnit.MILLISECONDS)

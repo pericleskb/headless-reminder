@@ -1,6 +1,5 @@
 package com.joyfulDonkey.headlessreminder.util.AlarmScheduler
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.joyfulDonkey.headlessreminder.data.alarm.AlarmSchedulerProperties
 import com.joyfulDonkey.headlessreminder.data.alarm.TimeOfDay
@@ -12,7 +11,6 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.roundToInt
 
-@RunWith(AndroidJUnit4::class)
 class AlarmSchedulerUtilsTest {
 
     //TODO add extra case for last and first alarm of the next day
@@ -20,11 +18,10 @@ class AlarmSchedulerUtilsTest {
     fun getAlarmIntervals_whenNoTimeLimit_thenIntervalsCorrect() {
         val properties = AlarmSchedulerProperties(
             numberOfAlarms = 10,
-            minIntervalBetweenAlarms = HOUR_IN_MS,
             earliestAlarmAt = TimeOfDay(0, 0),
             latestAlarmAt = TimeOfDay(0, 0)
         )
-        val intervalsList: ArrayList<Int> = AlarmSchedulerUtils.getAlarmIntervals(properties)
+        val intervalsList: ArrayList<Long> = AlarmSchedulerUtils.getAlarmIntervals(properties)
         intervalsList.sort()
 
         assertThat(properties.numberOfAlarms).isEqualTo(intervalsList.size)
@@ -44,11 +41,10 @@ class AlarmSchedulerUtilsTest {
         val minutesNow = calendarNow.get(Calendar.MINUTE)
         val properties = AlarmSchedulerProperties(
             numberOfAlarms = 10,
-            minIntervalBetweenAlarms = HOUR_IN_MS,
             earliestAlarmAt = TimeOfDay(hourNow + 1, minutesNow),
             latestAlarmAt = TimeOfDay(hourNow + 12, minutesNow)
         )
-        val intervalsList: ArrayList<Int> = AlarmSchedulerUtils.getAlarmIntervals(properties)
+        val intervalsList: ArrayList<Long> = AlarmSchedulerUtils.getAlarmIntervals(properties)
         intervalsList.sort()
 
         assertThat(properties.numberOfAlarms).isEqualTo(intervalsList.size)
@@ -73,15 +69,14 @@ class AlarmSchedulerUtilsTest {
         val minutesNow = calendarNow.get(Calendar.MINUTE)
         val properties = AlarmSchedulerProperties(
             numberOfAlarms = 10,
-            minIntervalBetweenAlarms = HOUR_IN_MS,
             earliestAlarmAt = TimeOfDay(hourNow - 6, minutesNow),
             latestAlarmAt = TimeOfDay(hourNow + 6, minutesNow)
         )
-        val intervalsList: ArrayList<Int> = AlarmSchedulerUtils.getAlarmIntervals(properties)
+        val intervalsList: ArrayList<Long> = AlarmSchedulerUtils.getAlarmIntervals(properties)
         intervalsList.sort()
 
         val evenDistributionMilliseconds = 6 * HOUR_IN_MS / 10
-        val minStartInterval = (evenDistributionMilliseconds * SALT_PERCENTAGE).toInt()
+        val minStartInterval = AlarmSchedulerUtils.START_NOW_OFFSET
 
         for (i in 0 until intervalsList.size - 1) {
             assertThat(intervalsList[i+1] - intervalsList[i]).isAtLeast(minStartInterval)

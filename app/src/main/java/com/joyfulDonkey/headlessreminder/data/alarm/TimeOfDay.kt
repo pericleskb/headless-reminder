@@ -9,10 +9,10 @@ data class TimeOfDay(
     val minute: Int
 ): Parcelable {
 
-    fun isEarlierThan(other: TimeOfDay): Boolean {
+    fun isEarlierThanOrSameTo(other: TimeOfDay): Boolean {
         if (hour < other.hour) {
             return true
-        } else if (hour == other.hour && minute >= other.minute) {
+        } else if (hour == other.hour && minute <= other.minute) {
             return true
         }
         return false
