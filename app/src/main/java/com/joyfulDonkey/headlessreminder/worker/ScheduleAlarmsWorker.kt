@@ -3,6 +3,8 @@ package com.joyfulDonkey.headlessreminder.worker
 import android.content.Context
 import androidx.work.*
 import com.joyfulDonkey.headlessreminder.data.alarm.AlarmSchedulerProperties
+import com.joyfulDonkey.headlessreminder.data.alarm.TimeOfDay
+import com.joyfulDonkey.headlessreminder.fragment.DashboardFragment
 import com.joyfulDonkey.headlessreminder.util.AlarmScheduler.AlarmSchedulerUtils
 import java.util.concurrent.TimeUnit
 
@@ -15,7 +17,16 @@ class ScheduleAlarmsWorker(private val appContext: Context, workerParameters: Wo
     }
 
     override fun doWork(): Result {
-        var alarmProperties: AlarmSchedulerProperties = AlarmSchedulerProperties()
+
+        val prefSettings = appContext.getSharedPreferences(
+            DashboardFragment.DEFINITIONS.prefs,
+            Context.MODE_PRIVATE
+        )
+        var alarmProperties: AlarmSchedulerProperties = AlarmSchedulerProperties(
+            prefSettings.getInt("numOfAlarms", 5),
+            TimeOfDay(prefSettings.getInt("hour",0),prefSettings.getInt("minute", 0)),
+            TimeOfDay(prefSettings.getInt("endHour",0),prefSettings.getInt("endMinute", 0))
+        )
         if (!inputData.keyValueMap.containsKey(ALARM_PROPERTIES_BUNDLE)) {
             //TODO remove else and testing case
 //            return Result.failure()
@@ -23,10 +34,10 @@ class ScheduleAlarmsWorker(private val appContext: Context, workerParameters: Wo
             alarmProperties =
                 inputData.keyValueMap[ALARM_PROPERTIES_BUNDLE] as AlarmSchedulerProperties
         }
-        val alarmIntervals = AlarmSchedulerUtils.getAlarmIntervals(alarmProperties)
-        for (alarmInterval in alarmIntervals) {
-            println("@@@ - interval - $alarmInterval")
-            setUpAlarm(alarmInterval)
+
+        AlarmSchedulerUtils.getAlarmIntervals(alarmProperties).forEach { interval ->
+            println("@@@ - interval - $interval")
+            setUpAlarm(interval)
         }
         return Result.success()
     }

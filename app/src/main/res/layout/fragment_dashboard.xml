@@ -1,37 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <TextView
         android:id="@+id/numOfAlarmsText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/alarmNumberPicker"
-        app:layout_constraintBottom_toBottomOf="@+id/alarmNumberPicker"
-        app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="16dp"
-        android:text="@string/num_of_alarms"/>
+        android:text="@string/num_of_alarms"
+        app:layout_constraintBottom_toBottomOf="@+id/numOfAlarmsPicker"
+        app:layout_constraintEnd_toStartOf="@id/numOfAlarmsPicker"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/numOfAlarmsPicker" />
 
     <NumberPicker
-        android:id="@+id/alarmNumberPicker"
+        android:id="@+id/numOfAlarmsPicker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@+id/numOfAlarmsText"
-        app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="16dp"
         android:backgroundTint="@color/gray"
-        />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/numOfAlarmsText"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/timeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="start time"
+        app:layout_constraintBottom_toBottomOf="@id/hourPicker"
+        app:layout_constraintEnd_toStartOf="@id/hourPicker"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/hourPicker" />
+
+    <NumberPicker
+        android:id="@+id/hourPicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:backgroundTint="@color/gray"
+        app:layout_constraintEnd_toStartOf="@+id/minutePicker"
+        app:layout_constraintStart_toEndOf="@+id/timeText"
+        app:layout_constraintTop_toBottomOf="@+id/numOfAlarmsPicker" />
+
+    <NumberPicker
+        android:id="@+id/minutePicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:backgroundTint="@color/gray"
+        app:layout_constraintBottom_toBottomOf="@id/hourPicker"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/hourPicker"
+        app:layout_constraintTop_toTopOf="@id/hourPicker" />
+
+    <TextView
+        android:id="@+id/endTimeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="end time"
+        app:layout_constraintBottom_toBottomOf="@id/endHourPicker"
+        app:layout_constraintEnd_toStartOf="@id/endHourPicker"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/endHourPicker" />
+
+    <NumberPicker
+        android:id="@+id/endHourPicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:backgroundTint="@color/gray"
+        app:layout_constraintEnd_toStartOf="@+id/endMinutePicker"
+        app:layout_constraintStart_toEndOf="@+id/endTimeText"
+        app:layout_constraintTop_toBottomOf="@+id/hourPicker" />
+
+    <NumberPicker
+        android:id="@+id/endMinutePicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:backgroundTint="@color/gray"
+        app:layout_constraintBottom_toBottomOf="@id/endHourPicker"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/endHourPicker"
+        app:layout_constraintTop_toTopOf="@id/endHourPicker" />
+
+    <TextView
+        android:id="@+id/logsTextView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/setAlarmsButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/endHourPicker"
+        tools:text="These are the logs"/>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/setAlarmsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/alarmNumberPicker"
-        app:layout_constraintTop_toTopOf="@id/alarmNumberPicker"
-        app:layout_constraintBottom_toBottomOf="@+id/alarmNumberPicker"
         android:layout_marginStart="16dp"
-        android:text="@string/set_alarms"/>
+        android:layout_marginBottom="24dp"
+        android:text="@string/set_alarms"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

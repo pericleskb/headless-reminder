@@ -37,14 +37,17 @@ object AlarmSchedulerUtils {
         for (i in 1 until properties.numberOfAlarms) {
             intervalsList.add(
                 firstAlarmDelay +
-                ((i + 0.5) * evenDistributionMs
-                        + (evenDistributionMs * generateRandomSalt(SALT_PERCENTAGE))
-                        ).toLong()
+                ((i + 0.5) * evenDistributionMs +
+                (evenDistributionMs * generateRandomSalt(SALT_PERCENTAGE))).toLong()
             )
         }
         return intervalsList
     }
 
+    /* Here we need to find out if alarms should be activated right now or the next day.
+     * To do this we need to find out if we are between the selected start and end time.
+     * If we are start right away. If we are not start on the next start time.
+     */
     private fun calculateFirstAlarmDelay(properties: AlarmSchedulerProperties): Long {
         val calendarNow = Calendar.getInstance()
 
