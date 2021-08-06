@@ -31,6 +31,7 @@ class ScheduleAlarmsService: Service() {
 
     override fun onCreate() {
         super.onCreate()
+        println("@@@ - interval")
         alarmMgr = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     }
 
@@ -38,20 +39,21 @@ class ScheduleAlarmsService: Service() {
         super.onStartCommand(intent, flags, startId)
         val alarmProperties: AlarmSchedulerProperties = intent?.getParcelableExtra(
             ALARM_PROPERTIES_BUNDLE) ?: AlarmSchedulerProperties()
-        val alarmIntervals = AlarmSchedulerUtils.getAlarmIntervals(alarmProperties)
-        for (alarmInterval in alarmIntervals) {
-            setUpAlarm(alarmInterval)
+        AlarmSchedulerUtils.getAlarmIntervals(alarmProperties).forEach { interval ->
+            println("@@@ - interval - $interval")
+            setUpAlarm(interval)
         }
+
         stopSelf()
         return START_REDELIVER_INTENT
     }
 
     private fun setUpAlarm(triggerAtMillis: Long) {
         //TODO set retry and backoff policy
-        val workRequest: WorkRequest = OneTimeWorkRequestBuilder<PlaySoundWorker>()
-            .setInitialDelay(triggerAtMillis, TimeUnit.MILLISECONDS)
-            .build()
-        WorkManager.getInstance(applicationContext).enqueue(workRequest)
+//        val workRequest: WorkRequest = OneTimeWorkRequestBuilder<PlaySoundWorker>()
+//            .setInitialDelay(triggerAtMillis, TimeUnit.MILLISECONDS)
+//            .build()
+//        WorkManager.getInstance(applicationContext).enqueue(workRequest)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
