@@ -40,7 +40,7 @@ class ScheduleAlarmsReceiver: BroadcastReceiver() {
         val timeToStart = Calendar.getInstance()
         timeToStart.set(Calendar.HOUR_OF_DAY, alarmProperties.earliestAlarmAt.hour)
         timeToStart.set(Calendar.MINUTE, alarmProperties.earliestAlarmAt.minute)
-        timeToStart.add(Calendar.HOUR_OF_DAY, 1)
+        timeToStart.add(Calendar.DAY_OF_MONTH, 1)
 
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val alarmIntent = Intent(context, ScheduleAlarmsReceiver::class.java).let { intent ->
@@ -48,7 +48,7 @@ class ScheduleAlarmsReceiver: BroadcastReceiver() {
         }
         val delay = timeToStart.timeInMillis - System.currentTimeMillis()
         alarmManager.setExact(
-            AlarmManager.ELAPSED_REALTIME_WAKEUP,
+            AlarmManager.ELAPSED_REALTIME,
             SystemClock.elapsedRealtime() + delay,
             alarmIntent
         )

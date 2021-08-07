@@ -26,7 +26,7 @@ class ScheduleAlarmsDelegate(
             PendingIntent.getBroadcast(context, index, intent, 0)
         }
         alarmManager.setExact(
-            AlarmManager.ELAPSED_REALTIME_WAKEUP,
+            AlarmManager.ELAPSED_REALTIME,
             SystemClock.elapsedRealtime() + triggerAtMillis,
             alarmIntent
         )

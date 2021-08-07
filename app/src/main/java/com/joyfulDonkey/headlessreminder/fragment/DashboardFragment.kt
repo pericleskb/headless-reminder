@@ -64,11 +64,13 @@ class DashboardFragment: Fragment() {
             prefsEditor?.putInt("endHour", binding.endHourPicker.value)
             prefsEditor?.putInt("endMinute", binding.endMinutePicker.value)
             prefsEditor?.apply()
-            setUpAlarms(AlarmSchedulerProperties(
-                binding.numOfAlarmsPicker.value,
-                TimeOfDay(binding.hourPicker.value, binding.minutePicker.value),
-                TimeOfDay(binding.endHourPicker.value, binding.endMinutePicker.value)
-            ))
+            setUpAlarms(
+                AlarmSchedulerProperties(
+                    binding.numOfAlarmsPicker.value,
+                    TimeOfDay(binding.hourPicker.value, binding.minutePicker.value),
+                    TimeOfDay(binding.endHourPicker.value, binding.endMinutePicker.value)
+                )
+            )
         }
         binding.numOfAlarmsPicker.minValue = 1
         binding.numOfAlarmsPicker.maxValue = 10
@@ -103,7 +105,7 @@ class DashboardFragment: Fragment() {
             val timeToStart = Calendar.getInstance()
             timeToStart.set(Calendar.HOUR_OF_DAY, properties.earliestAlarmAt.hour)
             timeToStart.set(Calendar.MINUTE, properties.earliestAlarmAt.minute)
-            timeToStart.add(Calendar.HOUR_OF_DAY, 1)
+            timeToStart.add(Calendar.DAY_OF_MONTH, 1)
             val delay = timeToStart.timeInMillis - System.currentTimeMillis()
             Log.i("@@@", "start alarm scheduler tomorrow")
             setUpAlarmScheduler(properties, delay)
@@ -120,7 +122,7 @@ class DashboardFragment: Fragment() {
             PendingIntent.getBroadcast(context, 0, intent, 0)
         }
         alarmManager.setExact(
-            AlarmManager.ELAPSED_REALTIME_WAKEUP,
+            AlarmManager.ELAPSED_REALTIME,
             SystemClock.elapsedRealtime() + delay,
             alarmIntent
         )
