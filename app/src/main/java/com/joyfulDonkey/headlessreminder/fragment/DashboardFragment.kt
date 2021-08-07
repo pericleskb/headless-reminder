@@ -6,12 +6,18 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.os.Bundle
+import android.os.SystemClock
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.joyfulDonkey.headlessreminder.broadcastReceiver.ScheduleAlarmsReceiver
+import com.joyfulDonkey.headlessreminder.data.alarm.AlarmSchedulerProperties
+import com.joyfulDonkey.headlessreminder.data.alarm.TimeOfDay
 import com.joyfulDonkey.headlessreminder.databinding.FragmentDashboardBinding
+import com.joyfulDonkey.headlessreminder.delegate.ScheduleAlarmsDelegate
+import com.joyfulDonkey.headlessreminder.util.AlarmScheduler.AlarmSchedulerUtils
 import com.joyfulDonkey.headlessreminder.util.AlarmScheduler.AlarmSchedulerUtils.HOUR_IN_MS
 import java.util.*
 
@@ -50,7 +56,6 @@ class DashboardFragment: Fragment() {
 
     private fun initResources() {
         binding.setAlarmsButton.setOnClickListener {
-            setUpAlarmScheduler(binding.hourPicker.value, binding.minutePicker.value)
             val prefSettings = activity?.getSharedPreferences(DEFINITIONS.prefs, MODE_PRIVATE)
             val prefsEditor = prefSettings?.edit()
             prefsEditor?.putInt("numOfAlarms", binding.numOfAlarmsPicker.value)
@@ -59,9 +64,13 @@ class DashboardFragment: Fragment() {
             prefsEditor?.putInt("endHour", binding.endHourPicker.value)
             prefsEditor?.putInt("endMinute", binding.endMinutePicker.value)
             prefsEditor?.apply()
-            scheduleTodaysAlarms()
+            setUpAlarms(AlarmSchedulerProperties(
+                binding.numOfAlarmsPicker.value,
+                TimeOfDay(binding.hourPicker.value, binding.minutePicker.value),
+                TimeOfDay(binding.endHourPicker.value, binding.endMinutePicker.value)
+            ))
         }
-        binding.numOfAlarmsPicker.minValue = 0
+        binding.numOfAlarmsPicker.minValue = 1
         binding.numOfAlarmsPicker.maxValue = 10
         binding.numOfAlarmsPicker.wrapSelectorWheel = false
 
@@ -72,51 +81,52 @@ class DashboardFragment: Fragment() {
 ////            "13","14","15","16","17","18","19",
 ////            "20","21","22","23","24"
 //        )
+        val now = Calendar.getInstance()
         binding.hourPicker.minValue = 0
         binding.hourPicker.maxValue = 23
+        binding.hourPicker.value = now.get(Calendar.HOUR_OF_DAY)
         binding.minutePicker.minValue = 0
         binding.minutePicker.maxValue = 59
+        binding.minutePicker.value = now.get(Calendar.MINUTE)
         binding.endHourPicker.minValue = 0
         binding.endHourPicker.maxValue = 23
+        binding.endHourPicker.value = 0
         binding.endMinutePicker.minValue = 0
         binding.endMinutePicker.maxValue = 59
+        binding.endMinutePicker.value = 0
     }
 
-    private fun setUpAlarmScheduler(startHour: Int, startMinute: Int) {
-        assert(startHour in 0..23 && startMinute in 0..59)
+    private fun setUpAlarms(properties: AlarmSchedulerProperties) {
+        if (AlarmSchedulerUtils.isBetweenAlarms(properties)) {
+            Log.i("@@@", "is between alarms. schedule now")
+            scheduleTodaysAlarms(properties)
+            val timeToStart = Calendar.getInstance()
+            timeToStart.set(Calendar.HOUR_OF_DAY, properties.earliestAlarmAt.hour)
+            timeToStart.set(Calendar.MINUTE, properties.earliestAlarmAt.minute)
+            timeToStart.add(Calendar.HOUR_OF_DAY, 1)
+            val delay = timeToStart.timeInMillis - System.currentTimeMillis()
+            Log.i("@@@", "start alarm scheduler tomorrow")
+            setUpAlarmScheduler(properties, delay)
+        } else {
+            Log.i("@@@", "is NOT between alarms")
+            setUpAlarmScheduler(properties, 0)
+        }
+    }
+
+    private fun setUpAlarmScheduler(properties: AlarmSchedulerProperties, delay: Long) {
+        assert(properties.earliestAlarmAt.hour in 0..23 && properties.earliestAlarmAt.minute in 0..59)
         val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val alarmIntent = Intent(context, ScheduleAlarmsReceiver::class.java).let { intent ->
             PendingIntent.getBroadcast(context, 0, intent, 0)
         }
-
-        //TODO better to use elapsed time in a later point. Find point before startTime and set to 24 hours
-        //TODO Watch for case where we try to set the next alarms but we are also before endTime (e.g. 24 hour alarms)
-        val startTime: Calendar = Calendar.getInstance().apply {
-            timeInMillis = System.currentTimeMillis()
-            set(Calendar.HOUR_OF_DAY, startHour)
-            set(Calendar.MINUTE, startMinute)
-        }
-        //if start time in past add one day
-        alarmManager.setRepeating(
-            AlarmManager.RTC,
-            startTime.timeInMillis,
-            HOUR_IN_MS * 24,
+        alarmManager.setExact(
+            AlarmManager.ELAPSED_REALTIME_WAKEUP,
+            SystemClock.elapsedRealtime() + delay,
             alarmIntent
         )
-    //Work  er implementation
-//        val scheduleAlarmsWork = PeriodicWorkRequestBuilder<ScheduleAlarmsWorker>(
-//            10, TimeUnit.MINUTES,
-//            2, TimeUnit.MINUTES)
-//            .build()
-//        context?.let { WorkManager.getInstance(it).enqueue(scheduleAlarmsWork) }
     }
 
-    private fun scheduleTodaysAlarms() {
-
-
-        //Workers
-//        val workRequest: WorkRequest = OneTimeWorkRequestBuilder<ScheduleAlarmsWorker>()
-//            .build()
-//        context?.let { WorkManager.getInstance(it).enqueue(workRequest) }
+    private fun scheduleTodaysAlarms(properties: AlarmSchedulerProperties) {
+        context?.let { ScheduleAlarmsDelegate(it, properties).scheduleAlarms() }
     }
 }

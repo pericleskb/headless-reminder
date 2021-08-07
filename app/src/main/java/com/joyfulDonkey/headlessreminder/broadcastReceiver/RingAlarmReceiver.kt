@@ -17,8 +17,8 @@ class RingAlarmReceiver: BroadcastReceiver() {
     private var mediaPlayer: MediaPlayer? = null
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        context?.applicationContext?.let {
-            mediaPlayer = MediaPlayer.create(it, R.raw.ting).apply {
+        context?.applicationContext?.let { context ->
+            mediaPlayer = MediaPlayer.create(context, R.raw.ting).apply {
                 setAudioAttributes(
                     AudioAttributes.Builder()
                         .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
