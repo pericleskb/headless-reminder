@@ -1,11 +1,11 @@
-package com.joyfulDonkey.headlessreminder.activity
+package com.joyfulDonkey.headlessreminder.dashboard.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.joyfulDonkey.headlessreminder.databinding.ActivityMainBinding
-import com.joyfulDonkey.headlessreminder.fragment.DashboardFragment
+import com.joyfulDonkey.headlessreminder.dashboard.fragment.selectTime.SelectTimeFragment
 
-class MainActivity: AppCompatActivity() {
+class DashboardActivity: AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
@@ -14,6 +14,6 @@ class MainActivity: AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportFragmentManager.beginTransaction()
-            .replace(binding.mainFrameLayout.id, DashboardFragment.newInstance()).commit()
+            .replace(binding.mainFrameLayout.id, SelectTimeFragment.newInstance()).commit()
     }
 }

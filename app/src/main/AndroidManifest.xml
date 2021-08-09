@@ -9,14 +9,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".activity.MainActivity">
+        <activity android:name="com.joyfulDonkey.headlessreminder.dashboard.activity.DashboardActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".broadcastReceiver.ScheduleAlarmsReceiver"/>
-        <receiver android:name=".broadcastReceiver.RingAlarmReceiver"/>
+        <receiver android:name="com.joyfulDonkey.headlessreminder.alarm.broadcastReceiver.ScheduleAlarmsReceiver"/>
+        <receiver android:name="com.joyfulDonkey.headlessreminder.alarm.broadcastReceiver.RingAlarmReceiver"/>
     </application>
 
 </manifest>

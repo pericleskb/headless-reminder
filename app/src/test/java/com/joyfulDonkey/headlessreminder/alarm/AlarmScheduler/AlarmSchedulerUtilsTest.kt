@@ -1,12 +1,12 @@
-package com.joyfulDonkey.headlessreminder.util.AlarmScheduler
+package com.joyfulDonkey.headlessreminder.alarm.AlarmScheduler
 
 import com.google.common.truth.Truth.assertThat
-import com.joyfulDonkey.headlessreminder.data.alarm.AlarmSchedulerProperties
-import com.joyfulDonkey.headlessreminder.data.alarm.TimeOfDay
-import com.joyfulDonkey.headlessreminder.util.AlarmScheduler.AlarmSchedulerUtils.HOUR_IN_MS
-import com.joyfulDonkey.headlessreminder.util.AlarmScheduler.AlarmSchedulerUtils.SALT_PERCENTAGE
+import com.joyfulDonkey.headlessreminder.alarm.util.AlarmSchedulerUtils
+import com.joyfulDonkey.headlessreminder.alarm.data.AlarmSchedulerProperties
+import com.joyfulDonkey.headlessreminder.alarm.data.TimeOfDay
+import com.joyfulDonkey.headlessreminder.alarm.util.AlarmSchedulerUtils.HOUR_IN_MS
+import com.joyfulDonkey.headlessreminder.alarm.util.AlarmSchedulerUtils.SALT_PERCENTAGE
 import org.junit.Test
-import org.junit.runner.RunWith
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.roundToInt

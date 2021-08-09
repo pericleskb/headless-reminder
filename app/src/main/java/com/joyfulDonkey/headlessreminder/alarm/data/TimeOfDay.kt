@@ -1,14 +1,11 @@
-package com.joyfulDonkey.headlessreminder.data.alarm
+package com.joyfulDonkey.headlessreminder.alarm.data
 
-import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
 import java.util.*
 
-@Parcelize
 data class TimeOfDay(
-    val hour: Int,
-    val minute: Int
-): Parcelable {
+    var hour: Int,
+    var minute: Int
+) {
 
     companion object {
         fun TimeOfDayNow(): TimeOfDay {

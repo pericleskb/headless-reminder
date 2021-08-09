@@ -1,7 +1,7 @@
-package com.joyfulDonkey.headlessreminder.util.AlarmScheduler
+package com.joyfulDonkey.headlessreminder.alarm.util
 
-import com.joyfulDonkey.headlessreminder.data.alarm.AlarmSchedulerProperties
-import com.joyfulDonkey.headlessreminder.data.alarm.TimeOfDay
+import com.joyfulDonkey.headlessreminder.alarm.data.AlarmSchedulerProperties
+import com.joyfulDonkey.headlessreminder.alarm.data.TimeOfDay
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.collections.ArrayList
