@@ -2,10 +2,10 @@
 <resources>
     <color name="colorPrimary">#37BEBA</color>
     <color name="colorPrimaryDark">#37BEBA</color>
-    <color name="colorAccent">#DBFFEE</color>
+    <color name="colorAccent">#A4E5E9</color>
     <color name="gray">#888888</color>
 
     <color name="puerto_rico">#37BEBA</color>
     <color name="rose">#F1C0B9</color>
-    <color name="frosted_mint">#DBFFEE</color>
+    <color name="tiffany_blue">#A4E5E9</color>
 </resources>
