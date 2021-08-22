@@ -78,7 +78,6 @@ class SelectTimeFragment: Fragment() {
             { _, hourOfDay, minute ->
                 val newTime = TimeOfDay(hourOfDay, minute)
                 dashboardViewModel.updateStartTime(newTime)
-                //TODO databinding
                 binding.startTimeSelector.text = newTime.toString()
             },
             dashboardViewModel.getAlarmProperties().earliestAlarmAt.hour,
@@ -104,6 +103,10 @@ class SelectTimeFragment: Fragment() {
         endTimeDialog.setTitle(getString(R.string.select_end_time))
         binding.endTimeSelector.setOnClickListener {
             endTimeDialog.show()
+        }
+
+        binding.numOfAlarmsPicker.setOnValueChangedListener { _, _, newVal ->
+            dashboardViewModel.updateRemindersPerDay(newVal)
         }
     }
 

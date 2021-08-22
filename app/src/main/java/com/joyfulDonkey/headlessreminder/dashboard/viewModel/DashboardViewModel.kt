@@ -15,7 +15,6 @@ import java.util.*
  * The first time the app will be created we read and show current time as start time.
  * Every time a value changes in the UI we will update the ViewModel.
  * When "Save" is pressed we update shared preferences
- * TODO check data binding, so that update the viewmodel is handled by the framework
  */
 class DashboardViewModel(application: Application) : AndroidViewModel(application) {
 

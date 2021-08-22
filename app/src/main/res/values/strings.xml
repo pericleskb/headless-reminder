@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Headless Reminder</string>
     <string name="num_of_alarms">Reminders per day</string>
-    <string name="set_alarms">Set alarms</string>
+    <string name="save_alarms">Save</string>
     <string name="start_time">Start time</string>
     <string name="end_time">End time</string>
     <string name="select_start_time">Select start time</string>
