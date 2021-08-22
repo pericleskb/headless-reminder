@@ -86,10 +86,12 @@ object AlarmSchedulerUtils {
         val calendarStartTime = Calendar.getInstance()
         calendarStartTime.set(Calendar.HOUR_OF_DAY, properties.earliestAlarmAt.hour)
         calendarStartTime.set(Calendar.MINUTE, properties.earliestAlarmAt.minute)
+        calendarStartTime.set(Calendar.SECOND, 0)
 
         val calendarEndTime = Calendar.getInstance()
         calendarEndTime.set(Calendar.HOUR_OF_DAY, properties.latestAlarmAt.hour)
         calendarEndTime.set(Calendar.MINUTE, properties.latestAlarmAt.minute)
+        calendarEndTime.set(Calendar.SECOND, 59)
 
         if (properties.latestAlarmAt.isEarlierThanOrSameTo(properties.earliestAlarmAt)) {
             calendarEndTime.add(Calendar.DATE, 1)

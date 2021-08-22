@@ -63,17 +63,16 @@ class SelectTimeFragment: Fragment() {
 ////            "13","14","15","16","17","18","19",
 ////            "20","21","22","23","24"
 //        )
+        //TODO extend number picker to set these values in the xml and to scroll faster
         binding.numOfAlarmsPicker.minValue = 1
         binding.numOfAlarmsPicker.maxValue = 10
         binding.numOfAlarmsPicker.wrapSelectorWheel = false
         binding.hourPicker.minValue = 0
         binding.hourPicker.maxValue = 23
-        binding.minutePicker.minValue = 0
-        binding.minutePicker.maxValue = 59
+        binding.minutePicker.displayedValues = arrayOf("00", "15", "30", "45")
         binding.endHourPicker.minValue = 0
         binding.endHourPicker.maxValue = 23
-        binding.endMinutePicker.minValue = 0
-        binding.endMinutePicker.maxValue = 59
+        binding.endMinutePicker.displayedValues = arrayOf("00", "15", "30", "45")
 
         binding.hourPicker.value = dashboardViewModel.getAlarmProperties().earliestAlarmAt.hour
         binding.minutePicker.value = dashboardViewModel.getAlarmProperties().earliestAlarmAt.minute
@@ -84,7 +83,8 @@ class SelectTimeFragment: Fragment() {
             setUpAlarms(dashboardViewModel.getAlarmProperties())
             dashboardViewModel.storePreferences()
         }
-        //TODO update view model's ui values when ui changes
+
+        //TODO check if we can use data binding
         binding.hourPicker.setOnValueChangedListener{ picker, oldVal, newVal ->
             val newTime = TimeOfDay(newVal, dashboardViewModel.getAlarmProperties().earliestAlarmAt.minute)
             dashboardViewModel.updateStartTime(newTime)

@@ -35,7 +35,7 @@ class AlarmSchedulerUtilsTest {
     }
 
     @Test
-    fun getAlarmIntervals_whenEarliestAlarmAtFuture_thenAllIntervalsInTimeLimit() {
+    fun getAlarmIntervals_whenEarliestAlarmAtFuture_thenAllIntervalsInTimeLimit_times100() {
         val calendarNow = Calendar.getInstance()
         val hourNow = calendarNow.get(Calendar.HOUR_OF_DAY)
         val minutesNow = calendarNow.get(Calendar.MINUTE)
@@ -44,22 +44,27 @@ class AlarmSchedulerUtilsTest {
             earliestAlarmAt = TimeOfDay(hourNow + 1, minutesNow),
             latestAlarmAt = TimeOfDay(hourNow + 12, minutesNow)
         )
-        val intervalsList: ArrayList<Long> = AlarmSchedulerUtils.getAlarmIntervals(properties)
-        intervalsList.sort()
 
-        assertThat(properties.numberOfAlarms).isEqualTo(intervalsList.size)
+        for(i in 0..1000) {
+            println(i)
+            val intervalsList: ArrayList<Long> = AlarmSchedulerUtils.getAlarmIntervals(properties)
+            intervalsList.sort()
 
-        val evenDistributionMilliseconds = 12 * HOUR_IN_MS / 10
-        val minInterval = (evenDistributionMilliseconds * SALT_PERCENTAGE).toInt()
-        for (i in 0 until intervalsList.size - 1) {
-            assertThat(intervalsList[i+1] - intervalsList[i]).isAtLeast(minInterval)
+            assertThat(properties.numberOfAlarms).isEqualTo(intervalsList.size)
+
+            val evenDistributionMilliseconds = 12 * HOUR_IN_MS / 10
+            val minInterval = (evenDistributionMilliseconds * SALT_PERCENTAGE).toInt()
+
+            for (i in 0 until intervalsList.size - 1) {
+                assertThat(intervalsList[i+1] - intervalsList[i]).isAtLeast(minInterval)
+            }
+
+            assertThat(intervalsList[0]).isAtLeast(HOUR_IN_MS)
+            assertThat(intervalsList[0]).isAtMost(HOUR_IN_MS + (4/3) * evenDistributionMilliseconds)
+
+            assertThat(intervalsList[intervalsList.size -1])
+                .isAtMost(HOUR_IN_MS + ((intervalsList.size -1 + 0.5).roundToInt()) * evenDistributionMilliseconds)
         }
-
-        assertThat(intervalsList[0]).isAtLeast(HOUR_IN_MS)
-        assertThat(intervalsList[0]).isAtMost(HOUR_IN_MS + (4/3) * evenDistributionMilliseconds)
-
-        assertThat(intervalsList[intervalsList.size -1])
-            .isAtMost(HOUR_IN_MS + ((intervalsList.size -1 + 0.5).roundToInt()) * evenDistributionMilliseconds)
     }
 
     @Test
