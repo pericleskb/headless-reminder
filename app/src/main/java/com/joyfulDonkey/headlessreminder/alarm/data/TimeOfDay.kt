@@ -24,4 +24,10 @@ data class TimeOfDay(
         }
         return false
     }
+
+    override fun toString(): String {
+        val hour: String = if (this.hour != 0) this.hour.toString() else "00"
+        val minute: String = if (this.minute != 0) this.minute.toString() else "00"
+        return "$hour:$minute"
+    }
 }

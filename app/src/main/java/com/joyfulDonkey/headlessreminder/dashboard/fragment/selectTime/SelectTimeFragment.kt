@@ -2,6 +2,7 @@ package com.joyfulDonkey.headlessreminder.dashboard.fragment.selectTime
 
 import android.app.AlarmManager
 import android.app.PendingIntent
+import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -11,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.joyfulDonkey.headlessreminder.R
 import com.joyfulDonkey.headlessreminder.alarm.broadcastReceiver.ScheduleAlarmsReceiver
 import com.joyfulDonkey.headlessreminder.alarm.data.AlarmSchedulerProperties
 import com.joyfulDonkey.headlessreminder.alarm.data.TimeOfDay
@@ -52,57 +54,56 @@ class SelectTimeFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initResources()
+        initLayout()
     }
 
     private fun initResources() {
         dashboardViewModel = ViewModelProvider(this).get(DashboardViewModel::class.java)
-//
-////        binding.hourPicker.displayedValues = arrayOf(
-////            "00","01","02","03","04","05","06",
-////            "07","08","09","10","11","12","13",
-////            "13","14","15","16","17","18","19",
-////            "20","21","22","23","24"
-//        )
-        //TODO extend number picker to set these values in the xml and to scroll faster
         binding.numOfAlarmsPicker.minValue = 1
         binding.numOfAlarmsPicker.maxValue = 10
         binding.numOfAlarmsPicker.wrapSelectorWheel = false
-        binding.hourPicker.minValue = 0
-        binding.hourPicker.maxValue = 23
-        binding.minutePicker.displayedValues = arrayOf("00", "15", "30", "45")
-        binding.endHourPicker.minValue = 0
-        binding.endHourPicker.maxValue = 23
-        binding.endMinutePicker.displayedValues = arrayOf("00", "15", "30", "45")
-
-        binding.hourPicker.value = dashboardViewModel.getAlarmProperties().earliestAlarmAt.hour
-        binding.minutePicker.value = dashboardViewModel.getAlarmProperties().earliestAlarmAt.minute
-        binding.endHourPicker.value = dashboardViewModel.getAlarmProperties().latestAlarmAt.hour
-        binding.endMinutePicker.value = dashboardViewModel.getAlarmProperties().latestAlarmAt.minute
+        binding.startTimeSelector.text = dashboardViewModel.getAlarmProperties().earliestAlarmAt.toString()
+        binding.endTimeSelector.text = dashboardViewModel.getAlarmProperties().latestAlarmAt.toString()
         binding.numOfAlarmsPicker.value = dashboardViewModel.getAlarmProperties().numberOfAlarms
+    }
+
+    private fun initLayout() {
         binding.setAlarmsButton.setOnClickListener {
             setUpAlarms(dashboardViewModel.getAlarmProperties())
             dashboardViewModel.storePreferences()
         }
 
-        //TODO check if we can use data binding
-        binding.hourPicker.setOnValueChangedListener{ picker, oldVal, newVal ->
-            val newTime = TimeOfDay(newVal, dashboardViewModel.getAlarmProperties().earliestAlarmAt.minute)
-            dashboardViewModel.updateStartTime(newTime)
+        val startTimeDialog = TimePickerDialog(
+            context,
+            { _, hourOfDay, minute ->
+                val newTime = TimeOfDay(hourOfDay, minute)
+                dashboardViewModel.updateStartTime(newTime)
+                //TODO databinding
+                binding.startTimeSelector.text = newTime.toString()
+            },
+            dashboardViewModel.getAlarmProperties().earliestAlarmAt.hour,
+            dashboardViewModel.getAlarmProperties().earliestAlarmAt.minute,
+            true
+        )
+        startTimeDialog.setTitle(getString(R.string.select_start_time))
+        binding.startTimeSelector.setOnClickListener {
+            startTimeDialog.show()
         }
-        binding.minutePicker.setOnValueChangedListener{ picker, oldVal, newVal ->
-            val newTime = TimeOfDay(dashboardViewModel.getAlarmProperties().earliestAlarmAt.hour, newVal)
-            dashboardViewModel.updateStartTime(newTime)
-        }
-        binding.endHourPicker.setOnValueChangedListener{ picker, oldVal, newVal ->
-            val newTime = TimeOfDay(newVal, dashboardViewModel.getAlarmProperties().latestAlarmAt.minute)
-            dashboardViewModel.updateEndTime(newTime)
-        }
-        binding.endMinutePicker.setOnValueChangedListener{ picker, oldVal, newVal ->
-            val newTime = TimeOfDay(dashboardViewModel.getAlarmProperties().latestAlarmAt.hour, newVal)
-            dashboardViewModel.updateEndTime(newTime)
-        }
-        binding.numOfAlarmsPicker.setOnValueChangedListener{ picker, oldVal, newVal ->
-            dashboardViewModel.updateRemindersPerDay(newVal)
+
+        val endTimeDialog = TimePickerDialog(
+            context,
+            { _, hourOfDay, minute ->
+                val newTime = TimeOfDay(hourOfDay, minute)
+                dashboardViewModel.updateEndTime(newTime)
+                binding.endTimeSelector.text = newTime.toString()
+            },
+            dashboardViewModel.getAlarmProperties().earliestAlarmAt.hour,
+            dashboardViewModel.getAlarmProperties().earliestAlarmAt.minute,
+            true
+        )
+        endTimeDialog.setTitle(getString(R.string.select_end_time))
+        binding.endTimeSelector.setOnClickListener {
+            endTimeDialog.show()
         }
     }
 
