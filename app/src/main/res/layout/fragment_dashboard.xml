@@ -79,7 +79,7 @@
         app:layout_constraintTop_toBottomOf="@+id/endTimeSelector" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/setAlarmsButton"
+        android:id="@+id/scheduleAlarmsButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -97,6 +97,16 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.25" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/loggingSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/enable_logging"
+        app:layout_constraintBottom_toTopOf="@+id/scheduleAlarmsButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/numOfAlarmsPicker" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

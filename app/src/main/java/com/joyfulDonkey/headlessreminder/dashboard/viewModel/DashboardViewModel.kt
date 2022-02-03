@@ -2,6 +2,7 @@ package com.joyfulDonkey.headlessreminder.dashboard.viewModel
 
 import android.app.Application
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -13,8 +14,9 @@ import java.util.*
 
 /*
  * The first time the app will be created we read and show current time as start time.
- * Every time a value changes in the UI we will update the ViewModel.
- * When "Save" is pressed we update shared preferences
+ * Every time a value changes in the UI we will update the ViewModel so that changes persist even
+ * if the Activity is stopped and restarted.
+ * When "Save" is pressed, then we update shared preferences
  */
 class DashboardViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -46,16 +48,18 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun storePreferences() {
-        val prefSettings = getApplication<Application>().getSharedPreferences(
-            SelectTimeFragment.DEFINITIONS.prefs,
-            Context.MODE_PRIVATE
-        )
-        val prefsEditor = prefSettings?.edit()
+        val prefsEditor = prefSettings.edit()
         prefsEditor?.putInt("numOfAlarms", alarmProperties.numberOfAlarms)
         prefsEditor?.putInt("hour", alarmProperties.earliestAlarmAt.hour)
         prefsEditor?.putInt("minute", alarmProperties.earliestAlarmAt.minute)
         prefsEditor?.putInt("endHour", alarmProperties.latestAlarmAt.hour)
         prefsEditor?.putInt("endMinute", alarmProperties.latestAlarmAt.minute)
+        prefsEditor?.apply()
+    }
+
+    fun saveLogFileUri(logFileUri: String) {
+        val prefsEditor = prefSettings.edit()
+        prefsEditor.putString("hrLogFileUri", logFileUri)
         prefsEditor?.apply()
     }
 }
