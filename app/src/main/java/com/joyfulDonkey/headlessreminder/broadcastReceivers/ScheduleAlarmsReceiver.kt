@@ -11,7 +11,7 @@ import com.joyfulDonkey.headlessreminder.models.alarm.AlarmSchedulerPropertiesMo
 import com.joyfulDonkey.headlessreminder.models.alarm.TimeOfDayModel
 import com.joyfulDonkey.headlessreminder.delegates.scheduleAlarm.ScheduleAlarmsDelegate
 import com.joyfulDonkey.headlessreminder.ui.dashboard.fragments.selectTime.SelectTimeFragment
-import com.joyfulDonkey.headlessreminder.delegates.files.WriteFileDelegateImpl
+import com.joyfulDonkey.headlessreminder.delegates.files.WriteFileDelegate
 import java.util.*
 
 class ScheduleAlarmsReceiver: BroadcastReceiver() {
@@ -64,6 +64,6 @@ class ScheduleAlarmsReceiver: BroadcastReceiver() {
             Context.MODE_PRIVATE
         )
         val uri = Uri.parse(prefSettings.getString("hrLogFileUri", ""))
-        WriteFileDelegateImpl(context).appendToFile(uri, content)
+        WriteFileDelegate(context).appendToFile(uri, content)
     }
 }
