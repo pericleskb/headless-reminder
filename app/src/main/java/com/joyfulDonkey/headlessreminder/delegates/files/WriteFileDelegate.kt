@@ -1,4 +1,4 @@
-package com.joyfulDonkey.headlessreminder.delegate.files
+package com.joyfulDonkey.headlessreminder.delegates.files
 
 import android.net.Uri
 

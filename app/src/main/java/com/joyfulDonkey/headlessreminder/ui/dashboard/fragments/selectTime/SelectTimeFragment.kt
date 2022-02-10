@@ -1,4 +1,4 @@
-package com.joyfulDonkey.headlessreminder.dashboard.fragment.selectTime
+package com.joyfulDonkey.headlessreminder.ui.dashboard.fragments.selectTime
 
 import android.app.Activity
 import android.app.Activity.RESULT_OK
@@ -7,11 +7,9 @@ import android.app.PendingIntent
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.os.SystemClock
-import android.provider.DocumentsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,13 +17,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.joyfulDonkey.headlessreminder.R
-import com.joyfulDonkey.headlessreminder.alarm.broadcastReceiver.ScheduleAlarmsReceiver
-import com.joyfulDonkey.headlessreminder.alarm.data.AlarmSchedulerProperties
-import com.joyfulDonkey.headlessreminder.alarm.data.TimeOfDay
+import com.joyfulDonkey.headlessreminder.broadcastReceivers.ScheduleAlarmsReceiver
+import com.joyfulDonkey.headlessreminder.models.alarm.AlarmSchedulerPropertiesModel
+import com.joyfulDonkey.headlessreminder.models.alarm.TimeOfDayModel
 import com.joyfulDonkey.headlessreminder.databinding.FragmentDashboardBinding
-import com.joyfulDonkey.headlessreminder.delegate.ScheduleAlarmsDelegate
-import com.joyfulDonkey.headlessreminder.alarm.util.AlarmSchedulerUtils
-import com.joyfulDonkey.headlessreminder.dashboard.viewModel.DashboardViewModel
+import com.joyfulDonkey.headlessreminder.delegates.scheduleAlarm.ScheduleAlarmsDelegate
+import com.joyfulDonkey.headlessreminder.ui.dashboard.viewModel.DashboardViewModel
+import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 
 class SelectTimeFragment: Fragment() {
@@ -84,7 +83,7 @@ class SelectTimeFragment: Fragment() {
         val startTimeDialog = TimePickerDialog(
             context,
             { _, hourOfDay, minute ->
-                val newTime = TimeOfDay(hourOfDay, minute)
+                val newTime = TimeOfDayModel(hourOfDay, minute)
                 dashboardViewModel.updateStartTime(newTime)
                 binding.startTimeSelector.text = newTime.toString()
             },
@@ -101,7 +100,7 @@ class SelectTimeFragment: Fragment() {
         val endTimeDialog = TimePickerDialog(
             context,
             { _, hourOfDay, minute ->
-                val newTime = TimeOfDay(hourOfDay, minute)
+                val newTime = TimeOfDayModel(hourOfDay, minute)
                 dashboardViewModel.updateEndTime(newTime)
                 binding.endTimeSelector.text = newTime.toString()
             },
@@ -120,19 +119,37 @@ class SelectTimeFragment: Fragment() {
 
         binding.loggingSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
-                createLogFile();
+                startFileSelectionActivity();
+            }
+        }
+
+        binding.onOffSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            val uri = dashboardViewModel.getFile()
+            val file: File = File(uri.path) //create path from uri
+            val split: Array<String> = file.getPath().split(":").toTypedArray() //split the path.
+            val filePath = split.get(1) //assign it to a string(your choice).
+
+            activity?.applicationContext?.contentResolver?.let {
+                it.openFileDescriptor(Uri.fromFile(File(filePath)), "w")?.use { parcelFileDescriptor ->
+                    FileOutputStream(parcelFileDescriptor.fileDescriptor).use { fos ->
+                        fos.write(
+                            "hello".toByteArray()
+                        )
+
+                }
+            }
+//            activity?.applicationContext?.contentResolver?.openFileDescriptor(Uri.fromFile(file), "w")?.use { parcelFileDescriptor ->
+//                FileOutputStream(parcelFileDescriptor.fileDescriptor).use {
+//                    it.write(
+//                        "hello".toByteArray()
+//                    )
+//                }
             }
         }
     }
 
-    private val createLogFile = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if (it.resultCode == RESULT_OK) {
-            it.data?.dataString?.let { uri -> dashboardViewModel.saveLogFileUri(uri) }
-        }
-    }
-
-    private fun setUpAlarms(properties: AlarmSchedulerProperties) {
-        if (AlarmSchedulerUtils.isBetweenAlarms(properties)) {
+    private fun setUpAlarms(properties: AlarmSchedulerPropertiesModel) {
+        if (properties.isBetweenAlarms()) {
             scheduleTodaysAlarms(properties)
             val timeToStart = Calendar.getInstance()
             timeToStart.set(Calendar.HOUR_OF_DAY, properties.earliestAlarmAt.hour)
@@ -145,7 +162,7 @@ class SelectTimeFragment: Fragment() {
         }
     }
 
-    private fun setUpAlarmScheduler(properties: AlarmSchedulerProperties, delay: Long) {
+    private fun setUpAlarmScheduler(properties: AlarmSchedulerPropertiesModel, delay: Long) {
         assert(properties.earliestAlarmAt.hour in 0..23 && properties.earliestAlarmAt.minute in 0..59)
         val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val alarmIntent = Intent(context, ScheduleAlarmsReceiver::class.java).let { intent ->
@@ -158,20 +175,26 @@ class SelectTimeFragment: Fragment() {
         )
     }
 
-    private fun scheduleTodaysAlarms(properties: AlarmSchedulerProperties) {
+    private fun scheduleTodaysAlarms(properties: AlarmSchedulerPropertiesModel) {
         context?.let { ScheduleAlarmsDelegate(it, properties).scheduleAlarms() }
     }
 
-    private fun createLogFile() {
+    private fun startFileSelectionActivity() {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
-            type = "application/txt"
+            type = "text/plain"
             putExtra(Intent.EXTRA_TITLE, "logs.txt")
             // Optionally, specify a URI for the directory that should be opened in
             // the system file picker before your app creates the document.
 //            putExtra(DocumentsContract.EXTRA_INITIAL_URI, Uri.Builder().)
         }
         createLogFile.launch(intent)
+    }
+
+    private val createLogFile = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == RESULT_OK) {
+            it.data?.dataString?.let { uri -> dashboardViewModel.saveLogFileUri(uri) }
+        }
     }
 
     override fun onActivityResult(

@@ -1,15 +1,13 @@
-package com.joyfulDonkey.headlessreminder.dashboard.viewModel
+package com.joyfulDonkey.headlessreminder.ui.dashboard.viewModel
 
 import android.app.Application
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.joyfulDonkey.headlessreminder.alarm.data.AlarmSchedulerProperties
-import com.joyfulDonkey.headlessreminder.alarm.data.TimeOfDay
-import com.joyfulDonkey.headlessreminder.dashboard.fragment.selectTime.SelectTimeFragment
+import com.joyfulDonkey.headlessreminder.models.alarm.AlarmSchedulerPropertiesModel
+import com.joyfulDonkey.headlessreminder.models.alarm.TimeOfDayModel
+import com.joyfulDonkey.headlessreminder.ui.dashboard.fragments.selectTime.SelectTimeFragment
 import java.util.*
 
 /*
@@ -25,21 +23,21 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
         Context.MODE_PRIVATE
     )
     private val now = Calendar.getInstance()
-    private var alarmProperties: AlarmSchedulerProperties = AlarmSchedulerProperties(
+    private var alarmProperties: AlarmSchedulerPropertiesModel = AlarmSchedulerPropertiesModel(
         prefSettings.getInt("numOfAlarms", 5),
-        TimeOfDay(prefSettings.getInt("hour",now.get(Calendar.HOUR_OF_DAY)),prefSettings.getInt("minute", now.get(Calendar.MINUTE))),
-        TimeOfDay(prefSettings.getInt("endHour",0),prefSettings.getInt("endMinute", 0))
+        TimeOfDayModel(prefSettings.getInt("hour",now.get(Calendar.HOUR_OF_DAY)),prefSettings.getInt("minute", now.get(Calendar.MINUTE))),
+        TimeOfDayModel(prefSettings.getInt("endHour",0),prefSettings.getInt("endMinute", 0))
     )
 
-    fun getAlarmProperties(): AlarmSchedulerProperties {
+    fun getAlarmProperties(): AlarmSchedulerPropertiesModel {
         return alarmProperties
     }
 
-    fun updateStartTime(newTime: TimeOfDay) {
+    fun updateStartTime(newTime: TimeOfDayModel) {
         this.alarmProperties.earliestAlarmAt = newTime
     }
 
-    fun updateEndTime(newTime: TimeOfDay) {
+    fun updateEndTime(newTime: TimeOfDayModel) {
         this.alarmProperties.latestAlarmAt = newTime
     }
 
@@ -61,5 +59,9 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
         val prefsEditor = prefSettings.edit()
         prefsEditor.putString("hrLogFileUri", logFileUri)
         prefsEditor?.apply()
+    }
+
+    fun getFile(): Uri {
+        return Uri.Builder().path(prefSettings.getString("hrLogFileUri", "")).build()
     }
 }

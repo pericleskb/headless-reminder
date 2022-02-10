@@ -1,9 +1,9 @@
-package com.joyfulDonkey.headlessreminder.dashboard.activity
+package com.joyfulDonkey.headlessreminder.ui.dashboard
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.joyfulDonkey.headlessreminder.databinding.ActivityMainBinding
-import com.joyfulDonkey.headlessreminder.dashboard.fragment.selectTime.SelectTimeFragment
+import com.joyfulDonkey.headlessreminder.ui.dashboard.fragments.selectTime.SelectTimeFragment
 
 class DashboardActivity: AppCompatActivity() {
 

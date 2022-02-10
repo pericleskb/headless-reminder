@@ -2,8 +2,8 @@ package com.joyfulDonkey.headlessreminder.alarm.AlarmScheduler
 
 import com.google.common.truth.Truth.assertThat
 import com.joyfulDonkey.headlessreminder.alarm.util.AlarmSchedulerUtils
-import com.joyfulDonkey.headlessreminder.alarm.data.AlarmSchedulerProperties
-import com.joyfulDonkey.headlessreminder.alarm.data.TimeOfDay
+import com.joyfulDonkey.headlessreminder.models.alarm.AlarmSchedulerPropertiesModel
+import com.joyfulDonkey.headlessreminder.models.alarm.TimeOfDayModel
 import com.joyfulDonkey.headlessreminder.alarm.util.AlarmSchedulerUtils.HOUR_IN_MS
 import com.joyfulDonkey.headlessreminder.alarm.util.AlarmSchedulerUtils.SALT_PERCENTAGE
 import org.junit.Test
@@ -16,10 +16,10 @@ class AlarmSchedulerUtilsTest {
     //TODO add extra case for last and first alarm of the next day
     @Test
     fun getAlarmIntervals_whenNoTimeLimit_thenIntervalsCorrect() {
-        val properties = AlarmSchedulerProperties(
+        val properties = AlarmSchedulerPropertiesModel(
             numberOfAlarms = 10,
-            earliestAlarmAt = TimeOfDay(0, 0),
-            latestAlarmAt = TimeOfDay(0, 0)
+            earliestAlarmAt = TimeOfDayModel(0, 0),
+            latestAlarmAt = TimeOfDayModel(0, 0)
         )
         val intervalsList: ArrayList<Long> = AlarmSchedulerUtils.getAlarmIntervals(properties)
         intervalsList.sort()
@@ -39,10 +39,10 @@ class AlarmSchedulerUtilsTest {
         val calendarNow = Calendar.getInstance()
         val hourNow = calendarNow.get(Calendar.HOUR_OF_DAY)
         val minutesNow = calendarNow.get(Calendar.MINUTE)
-        val properties = AlarmSchedulerProperties(
+        val properties = AlarmSchedulerPropertiesModel(
             numberOfAlarms = 10,
-            earliestAlarmAt = TimeOfDay(hourNow + 1, minutesNow),
-            latestAlarmAt = TimeOfDay(hourNow + 12, minutesNow)
+            earliestAlarmAt = TimeOfDayModel(hourNow + 1, minutesNow),
+            latestAlarmAt = TimeOfDayModel(hourNow + 12, minutesNow)
         )
 
         for(i in 0..1000) {
@@ -72,10 +72,10 @@ class AlarmSchedulerUtilsTest {
         val calendarNow = Calendar.getInstance()
         val hourNow = calendarNow.get(Calendar.HOUR_OF_DAY)
         val minutesNow = calendarNow.get(Calendar.MINUTE)
-        val properties = AlarmSchedulerProperties(
+        val properties = AlarmSchedulerPropertiesModel(
             numberOfAlarms = 10,
-            earliestAlarmAt = TimeOfDay(hourNow - 6, minutesNow),
-            latestAlarmAt = TimeOfDay(hourNow + 6, minutesNow)
+            earliestAlarmAt = TimeOfDayModel(hourNow - 6, minutesNow),
+            latestAlarmAt = TimeOfDayModel(hourNow + 6, minutesNow)
         )
         val intervalsList: ArrayList<Long> = AlarmSchedulerUtils.getAlarmIntervals(properties)
         intervalsList.sort()

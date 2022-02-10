@@ -1,4 +1,4 @@
-package com.joyfulDonkey.headlessreminder.alarm.broadcastReceiver
+package com.joyfulDonkey.headlessreminder.broadcastReceivers
 
 import android.content.BroadcastReceiver
 import android.content.Context
