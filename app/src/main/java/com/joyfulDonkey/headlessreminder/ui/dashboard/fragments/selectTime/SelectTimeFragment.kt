@@ -20,6 +20,7 @@ import com.joyfulDonkey.headlessreminder.broadcastReceivers.ScheduleAlarmsReceiv
 import com.joyfulDonkey.headlessreminder.models.alarm.AlarmSchedulerPropertiesModel
 import com.joyfulDonkey.headlessreminder.models.alarm.TimeOfDayModel
 import com.joyfulDonkey.headlessreminder.databinding.FragmentDashboardBinding
+import com.joyfulDonkey.headlessreminder.definitions.FileDefinitions
 import com.joyfulDonkey.headlessreminder.delegates.scheduleAlarm.ScheduleAlarmsDelegate
 import com.joyfulDonkey.headlessreminder.ui.dashboard.viewModel.DashboardViewModel
 import java.io.File
@@ -116,29 +117,6 @@ class SelectTimeFragment: Fragment() {
                 startFileSelectionActivity();
             }
         }
-
-        binding.onOffSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
-            val uri = dashboardViewModel.getFile()
-            val file = File(uri.path) //create path from uri
-            val split: Array<String> = file.path.split(":").toTypedArray() //split the path.
-            val filePath = split.get(1) //assign it to a string(your choice).
-
-            activity?.applicationContext?.contentResolver?.let {
-                it.openFileDescriptor(Uri.fromFile(File(filePath)), "w")?.use { parcelFileDescriptor ->
-                    FileOutputStream(parcelFileDescriptor.fileDescriptor).use { fos ->
-                        fos.write(
-                            "hello".toByteArray()
-                        )
-                    }
-                }
-//            activity?.applicationContext?.contentResolver?.openFileDescriptor(Uri.fromFile(file), "w")?.use { parcelFileDescriptor ->
-//                FileOutputStream(parcelFileDescriptor.fileDescriptor).use {
-//                    it.write(
-//                        "hello".toByteArray()
-//                    )
-//                }
-            }
-        }
     }
 
     private fun setUpAlarms(properties: AlarmSchedulerPropertiesModel) {
@@ -176,7 +154,7 @@ class SelectTimeFragment: Fragment() {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = "text/plain"
-            putExtra(Intent.EXTRA_TITLE, "logs.txt")
+            putExtra(Intent.EXTRA_TITLE, FileDefinitions.logFileName)
             // Optionally, specify a URI for the directory that should be opened in
             // the system file picker before your app creates the document.
 //            putExtra(DocumentsContract.EXTRA_INITIAL_URI, Uri.Builder().)
@@ -187,17 +165,6 @@ class SelectTimeFragment: Fragment() {
     private val createLogFile = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == RESULT_OK) {
             it.data?.dataString?.let { uri -> dashboardViewModel.saveLogFileUri(uri) }
-        }
-    }
-
-    override fun onActivityResult(
-        requestCode: Int, resultCode: Int, resultData: Intent?) {
-        if (requestCode == 1 && resultCode == RESULT_OK) {
-            // The result data contains a URI for the document or directory that
-            // the user selected.
-            resultData?.data?.also { uri ->
-                // Perform operations on the document using its URI.
-            }
         }
     }
 

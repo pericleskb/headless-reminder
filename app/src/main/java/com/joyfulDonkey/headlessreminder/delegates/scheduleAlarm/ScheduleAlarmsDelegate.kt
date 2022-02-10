@@ -49,7 +49,7 @@ class ScheduleAlarmsDelegate(
             PreferenceDefinitions.preferencesName,
             Context.MODE_PRIVATE
         )
-        val uri = Uri.parse(prefSettings.getString("hrLogFileUri", ""))
+        val uri = Uri.parse(prefSettings.getString(PreferenceDefinitions.logFileUri, ""))
         WriteFileDelegate(context).appendToFile(uri, content)
     }
 }

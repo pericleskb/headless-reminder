@@ -1,7 +1,6 @@
 package com.joyfulDonkey.headlessreminder.definitions
 
 object PreferenceDefinitions {
-
     const val preferencesName = "DonkeyMonkey"
     
     const val numOfAlarms = "numOfAlarms"
@@ -11,5 +10,8 @@ object PreferenceDefinitions {
     const val endMinute = "endMinute"
     
     const val logFileUri = "hrLogFileUri"
+}
 
+object FileDefinitions {
+    const val logFileName = "scheduleLogs.txt"
 }

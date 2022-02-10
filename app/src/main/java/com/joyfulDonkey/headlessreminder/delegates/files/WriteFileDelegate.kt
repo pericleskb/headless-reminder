@@ -10,10 +10,9 @@ class WriteFileDelegate(
     private val context: Context
 ) {
 
-    fun
-            appendToFile(uri: Uri, content: String) {
+    fun appendToFile(uri: Uri, content: String) {
         try {
-            context.applicationContext.contentResolver.openAssetFileDescriptor(uri, "w")?.use { parcelFileDescriptor ->
+            context.applicationContext.contentResolver.openAssetFileDescriptor(uri, "wa")?.use { parcelFileDescriptor ->
                 FileOutputStream(parcelFileDescriptor.fileDescriptor).use {
                     it.write(
                         content.toByteArray()
