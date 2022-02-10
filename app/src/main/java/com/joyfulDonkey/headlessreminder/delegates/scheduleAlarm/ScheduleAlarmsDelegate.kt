@@ -7,12 +7,13 @@ import android.content.Intent
 import android.net.Uri
 import android.os.SystemClock
 import com.joyfulDonkey.headlessreminder.broadcastReceivers.RingAlarmReceiver
+import com.joyfulDonkey.headlessreminder.definitions.PreferenceDefinitions
 import com.joyfulDonkey.headlessreminder.models.alarm.AlarmSchedulerPropertiesModel
 import com.joyfulDonkey.headlessreminder.models.alarm.TimeOfDayModel
-import com.joyfulDonkey.headlessreminder.ui.dashboard.fragments.selectTime.SelectTimeFragment
 import com.joyfulDonkey.headlessreminder.delegates.files.WriteFileDelegate
 import java.util.*
 
+//Circular dependency with broadcast receivers package
 class ScheduleAlarmsDelegate(
     private val context: Context,
     private val alarmProperties: AlarmSchedulerPropertiesModel
@@ -45,7 +46,7 @@ class ScheduleAlarmsDelegate(
             triggerDate.get(Calendar.MINUTE))
         val content = "Alarm scheduled for $triggerTimeOfDay\n"
         val prefSettings = context.getSharedPreferences(
-            SelectTimeFragment.DEFINITIONS.prefs,
+            PreferenceDefinitions.preferencesName,
             Context.MODE_PRIVATE
         )
         val uri = Uri.parse(prefSettings.getString("hrLogFileUri", ""))

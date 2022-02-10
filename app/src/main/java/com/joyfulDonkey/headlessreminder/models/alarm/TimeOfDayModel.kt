@@ -8,7 +8,7 @@ data class TimeOfDayModel(
 ) {
 
     companion object {
-        fun TimeOfDayNow(): TimeOfDayModel {
+        fun timeOfDayNow(): TimeOfDayModel {
             val calendarNow = Calendar.getInstance()
             return TimeOfDayModel(
                 calendarNow.get(Calendar.HOUR_OF_DAY),

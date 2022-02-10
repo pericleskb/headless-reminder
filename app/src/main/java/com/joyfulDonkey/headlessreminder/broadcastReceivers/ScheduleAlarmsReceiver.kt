@@ -7,10 +7,10 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.SystemClock
+import com.joyfulDonkey.headlessreminder.definitions.PreferenceDefinitions
 import com.joyfulDonkey.headlessreminder.models.alarm.AlarmSchedulerPropertiesModel
 import com.joyfulDonkey.headlessreminder.models.alarm.TimeOfDayModel
 import com.joyfulDonkey.headlessreminder.delegates.scheduleAlarm.ScheduleAlarmsDelegate
-import com.joyfulDonkey.headlessreminder.ui.dashboard.fragments.selectTime.SelectTimeFragment
 import com.joyfulDonkey.headlessreminder.delegates.files.WriteFileDelegate
 import java.util.*
 
@@ -18,13 +18,13 @@ class ScheduleAlarmsReceiver: BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         val prefSettings = context?.getSharedPreferences(
-            SelectTimeFragment.DEFINITIONS.prefs,
+            PreferenceDefinitions.preferencesName,
             Context.MODE_PRIVATE
         ) ?: return
         val alarmProperties = AlarmSchedulerPropertiesModel(
-            prefSettings.getInt("numOfAlarms", 5),
-            TimeOfDayModel(prefSettings.getInt("hour",0),prefSettings.getInt("minute", 0)),
-            TimeOfDayModel(prefSettings.getInt("endHour",0),prefSettings.getInt("endMinute", 0))
+            prefSettings.getInt(PreferenceDefinitions.numOfAlarms, 5),
+            TimeOfDayModel(prefSettings.getInt(PreferenceDefinitions.hour,0),prefSettings.getInt(PreferenceDefinitions.minute, 0)),
+            TimeOfDayModel(prefSettings.getInt(PreferenceDefinitions.endHour,0),prefSettings.getInt(PreferenceDefinitions.endMinute, 0))
         )
         scheduleSelf(context, alarmProperties)
         ScheduleAlarmsDelegate(context, alarmProperties).scheduleAlarms()
@@ -58,9 +58,9 @@ class ScheduleAlarmsReceiver: BroadcastReceiver() {
         val triggerTimeOfDay = TimeOfDayModel(
             triggerDate.get(Calendar.HOUR_OF_DAY),
             triggerDate.get(Calendar.MINUTE))
-        val content = "Time now = ${TimeOfDayModel.TimeOfDayNow()} - Next alarm scheduled for ${triggerTimeOfDay.toString()}\n"
+        val content = "Time now = ${TimeOfDayModel.timeOfDayNow()} - Next alarm scheduled for ${triggerTimeOfDay.toString()}\n"
         val prefSettings = context.getSharedPreferences(
-            SelectTimeFragment.DEFINITIONS.prefs,
+            PreferenceDefinitions.preferencesName,
             Context.MODE_PRIVATE
         )
         val uri = Uri.parse(prefSettings.getString("hrLogFileUri", ""))

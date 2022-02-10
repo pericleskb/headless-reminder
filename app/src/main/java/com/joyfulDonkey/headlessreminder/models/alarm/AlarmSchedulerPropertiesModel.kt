@@ -55,7 +55,7 @@ data class AlarmSchedulerPropertiesModel(
     }
 
     fun isBetweenAlarms(): Boolean {
-        val timeOfDayNow = TimeOfDayModel.TimeOfDayNow()
+        val timeOfDayNow = TimeOfDayModel.timeOfDayNow()
         val startTimePassed = this.earliestAlarmAt.isEarlierThanOrSameTo(timeOfDayNow)
         val endTimePassed = this.latestAlarmAt.isEarlierThanOrSameTo(timeOfDayNow)
 
@@ -85,7 +85,7 @@ data class AlarmSchedulerPropertiesModel(
         calendarStartTime.set(Calendar.HOUR_OF_DAY, this.earliestAlarmAt.hour)
         calendarStartTime.set(Calendar.MINUTE, this.earliestAlarmAt.minute)
 
-        if (this.earliestAlarmAt.isEarlierThanOrSameTo(TimeOfDayModel.TimeOfDayNow())) {
+        if (this.earliestAlarmAt.isEarlierThanOrSameTo(TimeOfDayModel.timeOfDayNow())) {
             calendarStartTime.add(Calendar.DATE, 1)
         }
         return calendarStartTime.timeInMillis - System.currentTimeMillis()

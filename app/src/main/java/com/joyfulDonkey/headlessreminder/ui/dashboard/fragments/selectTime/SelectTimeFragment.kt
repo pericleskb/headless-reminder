@@ -1,6 +1,5 @@
 package com.joyfulDonkey.headlessreminder.ui.dashboard.fragments.selectTime
 
-import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -29,10 +28,6 @@ import java.util.*
 
 class SelectTimeFragment: Fragment() {
 
-    object DEFINITIONS {
-        const val prefs = "DonkeyMonkey"
-    }
-
     private lateinit var binding: FragmentDashboardBinding
     private lateinit var dashboardViewModel: DashboardViewModel
 
@@ -50,8 +45,7 @@ class SelectTimeFragment: Fragment() {
         layoutInflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    )
-            : View {
+    ) : View {
         binding = FragmentDashboardBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
@@ -125,8 +119,8 @@ class SelectTimeFragment: Fragment() {
 
         binding.onOffSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
             val uri = dashboardViewModel.getFile()
-            val file: File = File(uri.path) //create path from uri
-            val split: Array<String> = file.getPath().split(":").toTypedArray() //split the path.
+            val file = File(uri.path) //create path from uri
+            val split: Array<String> = file.path.split(":").toTypedArray() //split the path.
             val filePath = split.get(1) //assign it to a string(your choice).
 
             activity?.applicationContext?.contentResolver?.let {
@@ -135,9 +129,8 @@ class SelectTimeFragment: Fragment() {
                         fos.write(
                             "hello".toByteArray()
                         )
-
+                    }
                 }
-            }
 //            activity?.applicationContext?.contentResolver?.openFileDescriptor(Uri.fromFile(file), "w")?.use { parcelFileDescriptor ->
 //                FileOutputStream(parcelFileDescriptor.fileDescriptor).use {
 //                    it.write(
@@ -199,10 +192,7 @@ class SelectTimeFragment: Fragment() {
 
     override fun onActivityResult(
         requestCode: Int, resultCode: Int, resultData: Intent?) {
-        if (requestCode == 1
-
-
-            && resultCode == Activity.RESULT_OK) {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
             // The result data contains a URI for the document or directory that
             // the user selected.
             resultData?.data?.also { uri ->
