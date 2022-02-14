@@ -31,8 +31,8 @@ data class AlarmSchedulerPropertiesModel(
         const val START_NOW_OFFSET = (SECOND_IN_MS * 10)
     }
 
+    //TODO bug. When between alarms alarms will be set even after end time
     fun getAlarmIntervals(): ArrayList<Long> {
-
         val firstAlarmDelay = calculateFirstAlarmDelay()
         val evenDistributionMs = calculateEvenDistributionMs()
 

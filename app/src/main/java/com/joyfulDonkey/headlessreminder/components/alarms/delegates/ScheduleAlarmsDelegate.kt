@@ -13,12 +13,10 @@ import com.joyfulDonkey.headlessreminder.models.alarm.TimeOfDayModel
 import com.joyfulDonkey.headlessreminder.components.files.delegates.WriteFileDelegate
 import java.util.*
 
-//Circular dependency with broadcast receivers package
 class ScheduleAlarmsDelegate(
     private val context: Context,
     private val alarmProperties: AlarmSchedulerPropertiesModel
 ) {
-
 
     fun scheduleAlarms() {
         alarmProperties.getAlarmIntervals().forEachIndexed { index, interval ->

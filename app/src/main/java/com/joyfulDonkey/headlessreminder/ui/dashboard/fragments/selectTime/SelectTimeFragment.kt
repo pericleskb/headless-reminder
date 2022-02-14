@@ -118,15 +118,15 @@ class SelectTimeFragment: Fragment() {
 
     private fun setUpAlarms(properties: AlarmSchedulerPropertiesModel) {
         if (properties.isBetweenAlarms()) {
-            scheduleTodaysAlarms(properties)
+            val intent = Intent(context, ScheduleAlarmsReceiver::class.java)
+            activity?.sendBroadcast(intent)
+        } else {
             val timeToStart = Calendar.getInstance()
             timeToStart.set(Calendar.HOUR_OF_DAY, properties.earliestAlarmAt.hour)
             timeToStart.set(Calendar.MINUTE, properties.earliestAlarmAt.minute)
             timeToStart.add(Calendar.DAY_OF_MONTH, 1)
             val delay = timeToStart.timeInMillis - System.currentTimeMillis()
             setUpAlarmScheduler(properties, delay)
-        } else {
-            setUpAlarmScheduler(properties, 0)
         }
     }
 
@@ -141,10 +141,12 @@ class SelectTimeFragment: Fragment() {
             SystemClock.elapsedRealtime() + delay,
             alarmIntent
         )
-    }
-
-    private fun scheduleTodaysAlarms(properties: AlarmSchedulerPropertiesModel) {
-        context?.let { ScheduleAlarmsDelegate(it, properties).scheduleAlarms() }
+//        val timeToStart = Calendar.getInstance()
+//        timeToStart.timeInMillis = System.currentTimeMillis() + delay
+//        val triggerTimeOfDay = TimeOfDayModel(
+//            timeToStart.get(Calendar.HOUR_OF_DAY),
+//            timeToStart.get(Calendar.MINUTE))
+//        val content = "Time now = ${TimeOfDayModel.timeOfDayNow()} - Next schedule time: $triggerTimeOfDay ${timeToStart.get(Calendar.DAY_OF_MONTH)}\\${timeToStart.get(Calendar.MONTH) + 1} \n"
     }
 
     private fun startFileSelectionActivity() {
