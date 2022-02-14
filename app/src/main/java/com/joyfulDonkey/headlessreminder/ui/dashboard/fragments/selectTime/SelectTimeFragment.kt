@@ -163,7 +163,18 @@ class SelectTimeFragment: Fragment() {
 
     private val createLogFile = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == RESULT_OK) {
-            it.data?.dataString?.let { uri -> dashboardViewModel.saveLogFileUri(uri) }
+            it.data.let { intent ->
+                intent?.data?.let { uri ->
+                    //we use this so the permission to edit the URI will be persisted through device reboots
+                    val contentResolver = activity?.applicationContext?.contentResolver
+                    val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    contentResolver?.takePersistableUriPermission(uri, takeFlags)
+                }
+                intent?.dataString?.let { uri ->
+                    dashboardViewModel.saveLogFileUri(uri) }
+                }
+
         }
     }
 
