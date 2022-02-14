@@ -6,7 +6,6 @@ import android.app.PendingIntent
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.LayoutInflater
@@ -16,15 +15,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.joyfulDonkey.headlessreminder.R
-import com.joyfulDonkey.headlessreminder.broadcastReceivers.ScheduleAlarmsReceiver
+import com.joyfulDonkey.headlessreminder.components.alarms.broadcastReceivers.ScheduleAlarmsReceiver
 import com.joyfulDonkey.headlessreminder.models.alarm.AlarmSchedulerPropertiesModel
 import com.joyfulDonkey.headlessreminder.models.alarm.TimeOfDayModel
 import com.joyfulDonkey.headlessreminder.databinding.FragmentDashboardBinding
 import com.joyfulDonkey.headlessreminder.definitions.FileDefinitions
-import com.joyfulDonkey.headlessreminder.delegates.scheduleAlarm.ScheduleAlarmsDelegate
+import com.joyfulDonkey.headlessreminder.components.alarms.delegates.ScheduleAlarmsDelegate
 import com.joyfulDonkey.headlessreminder.ui.dashboard.viewModel.DashboardViewModel
-import java.io.File
-import java.io.FileOutputStream
 import java.util.*
 
 class SelectTimeFragment: Fragment() {

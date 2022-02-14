@@ -3,7 +3,6 @@ package com.joyfulDonkey.headlessreminder.ui.dashboard.viewModel
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import com.joyfulDonkey.headlessreminder.definitions.PreferenceDefinitions
 import com.joyfulDonkey.headlessreminder.models.alarm.AlarmSchedulerPropertiesModel
@@ -59,9 +58,5 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
         val prefsEditor = prefSettings.edit()
         prefsEditor.putString(PreferenceDefinitions.logFileUri, logFileUri)
         prefsEditor?.apply()
-    }
-
-    fun getFile(): Uri {
-        return Uri.Builder().path(prefSettings.getString(PreferenceDefinitions.logFileUri, "")).build()
     }
 }

@@ -1,4 +1,4 @@
-package com.joyfulDonkey.headlessreminder.delegates.scheduleAlarm
+package com.joyfulDonkey.headlessreminder.components.alarms.delegates
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -6,11 +6,11 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.SystemClock
-import com.joyfulDonkey.headlessreminder.broadcastReceivers.RingAlarmReceiver
+import com.joyfulDonkey.headlessreminder.components.alarms.broadcastReceivers.RingAlarmReceiver
 import com.joyfulDonkey.headlessreminder.definitions.PreferenceDefinitions
 import com.joyfulDonkey.headlessreminder.models.alarm.AlarmSchedulerPropertiesModel
 import com.joyfulDonkey.headlessreminder.models.alarm.TimeOfDayModel
-import com.joyfulDonkey.headlessreminder.delegates.files.WriteFileDelegate
+import com.joyfulDonkey.headlessreminder.components.files.delegates.WriteFileDelegate
 import java.util.*
 
 //Circular dependency with broadcast receivers package
@@ -18,6 +18,8 @@ class ScheduleAlarmsDelegate(
     private val context: Context,
     private val alarmProperties: AlarmSchedulerPropertiesModel
 ) {
+
+
     fun scheduleAlarms() {
         alarmProperties.getAlarmIntervals().forEachIndexed { index, interval ->
             setUpAlarm(context, interval, index)
@@ -35,12 +37,12 @@ class ScheduleAlarmsDelegate(
             triggerAt,
             alarmIntent
         )
-        logAlarmTime(context, triggerAt)
+        logAlarmTime(context, triggerAtMillis)
     }
 
     private fun logAlarmTime(context: Context, triggerAt: Long) {
         val triggerDate = Calendar.getInstance()
-        triggerDate.timeInMillis = triggerAt
+        triggerDate.timeInMillis = System.currentTimeMillis() + triggerAt
         val triggerTimeOfDay = TimeOfDayModel(
             triggerDate.get(Calendar.HOUR_OF_DAY),
             triggerDate.get(Calendar.MINUTE))

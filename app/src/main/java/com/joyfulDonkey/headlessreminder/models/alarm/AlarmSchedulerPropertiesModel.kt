@@ -17,7 +17,7 @@ import kotlin.collections.ArrayList
  * And the last one can be till the end of the time limit.
  **********************************************************************/
 data class AlarmSchedulerPropertiesModel(
-    var numberOfAlarms: Int = 3,
+    var numberOfAlarms: Int,
     //TODO set to current time and midnight if not set
     var earliestAlarmAt: TimeOfDayModel = TimeOfDayModel(18,0),
     var latestAlarmAt: TimeOfDayModel = TimeOfDayModel(18, 15)

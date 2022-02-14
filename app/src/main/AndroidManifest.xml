@@ -15,8 +15,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name="com.joyfulDonkey.headlessreminder.broadcastReceivers.ScheduleAlarmsReceiver"/>
-        <receiver android:name="com.joyfulDonkey.headlessreminder.broadcastReceivers.RingAlarmReceiver"/>
+        <receiver android:name="com.joyfulDonkey.headlessreminder.components.alarms.broadcastReceivers.ScheduleAlarmsReceiver"/>
+        <receiver android:name="com.joyfulDonkey.headlessreminder.components.alarms.broadcastReceivers.RingAlarmReceiver"/>
     </application>
 
 </manifest>

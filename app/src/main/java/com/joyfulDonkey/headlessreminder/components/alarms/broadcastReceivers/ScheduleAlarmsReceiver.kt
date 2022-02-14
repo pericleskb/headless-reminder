@@ -1,4 +1,4 @@
-package com.joyfulDonkey.headlessreminder.broadcastReceivers
+package com.joyfulDonkey.headlessreminder.components.alarms.broadcastReceivers
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -10,8 +10,8 @@ import android.os.SystemClock
 import com.joyfulDonkey.headlessreminder.definitions.PreferenceDefinitions
 import com.joyfulDonkey.headlessreminder.models.alarm.AlarmSchedulerPropertiesModel
 import com.joyfulDonkey.headlessreminder.models.alarm.TimeOfDayModel
-import com.joyfulDonkey.headlessreminder.delegates.scheduleAlarm.ScheduleAlarmsDelegate
-import com.joyfulDonkey.headlessreminder.delegates.files.WriteFileDelegate
+import com.joyfulDonkey.headlessreminder.components.alarms.delegates.ScheduleAlarmsDelegate
+import com.joyfulDonkey.headlessreminder.components.files.delegates.WriteFileDelegate
 import java.util.*
 
 class ScheduleAlarmsReceiver: BroadcastReceiver() {
@@ -49,16 +49,14 @@ class ScheduleAlarmsReceiver: BroadcastReceiver() {
             triggerAt,
             alarmIntent
         )
-        logNextScheduleTime(context, triggerAt)
+        logNextScheduleTime(context, timeToStart)
     }
 
-    private fun logNextScheduleTime(context: Context, triggerAt: Long) {
-        val triggerDate = Calendar.getInstance()
-        triggerDate.timeInMillis = triggerAt
+    private fun logNextScheduleTime(context: Context, timeToStart: Calendar) {
         val triggerTimeOfDay = TimeOfDayModel(
-            triggerDate.get(Calendar.HOUR_OF_DAY),
-            triggerDate.get(Calendar.MINUTE))
-        val content = "Time now = ${TimeOfDayModel.timeOfDayNow()} - Next alarm scheduled for ${triggerTimeOfDay.toString()}\n"
+            timeToStart.get(Calendar.HOUR_OF_DAY),
+            timeToStart.get(Calendar.MINUTE))
+        val content = "Time now = ${TimeOfDayModel.timeOfDayNow()} - Next schedule time: $triggerTimeOfDay ${timeToStart.get(Calendar.DAY_OF_MONTH)}\\${timeToStart.get(Calendar.MONTH) + 1} \n"
         val prefSettings = context.getSharedPreferences(
             PreferenceDefinitions.preferencesName,
             Context.MODE_PRIVATE
