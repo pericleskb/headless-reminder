@@ -54,22 +54,6 @@ data class AlarmSchedulerPropertiesModel(
         return intervalsList
     }
 
-//    fun isBetweenAlarms(timeOfDay: TimeOfDayModel): Boolean {
-//        val startTimePassed = this.earliestAlarmAt.isEarlierThanOrSameTo(timeOfDay)
-//        val endTimePassed = this.latestAlarmAt.isEarlierThanOrSameTo(timeOfDay)
-//
-//        return if (this.earliestAlarmAt.isEarlierThanOrSameTo(this.latestAlarmAt)) {
-//            startTimePassed && !endTimePassed
-//        } else {
-//            // case when end time is on the next day
-//            if (timeOfDay.isEarlierThanOrSameTo(TimeOfDayModel(23, 59))) {
-//                startTimePassed
-//            } else {
-//                !endTimePassed
-//            }
-//        }
-//    }
-
     /* Here we need to find out if alarms should be activated right now or the next day.
      * To do this we need to find out if we are between the selected start and end time.
      * If we are, start right away. If we are not, start on the next start time.
