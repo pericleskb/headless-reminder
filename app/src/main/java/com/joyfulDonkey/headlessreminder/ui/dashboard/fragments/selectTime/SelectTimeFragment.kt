@@ -96,8 +96,8 @@ class SelectTimeFragment: Fragment() {
                 dashboardViewModel.updateEndTime(newTime)
                 binding.endTimeSelector.text = newTime.toString()
             },
-            dashboardViewModel.getAlarmProperties().earliestAlarmAt.hour,
-            dashboardViewModel.getAlarmProperties().earliestAlarmAt.minute,
+            dashboardViewModel.getAlarmProperties().latestAlarmAt.hour,
+            dashboardViewModel.getAlarmProperties().latestAlarmAt.minute,
             true
         )
         endTimeDialog.setTitle(getString(R.string.select_end_time))
@@ -117,14 +117,16 @@ class SelectTimeFragment: Fragment() {
     }
 
     private fun setUpAlarms(properties: AlarmSchedulerPropertiesModel) {
-        if (properties.isBetweenAlarms()) {
+        if (TimeOfDayModel.timeOfDayNow().isBetweenAlarms(properties)) {
             val intent = Intent(context, ScheduleAlarmsReceiver::class.java)
             activity?.sendBroadcast(intent)
         } else {
             val timeToStart = Calendar.getInstance()
             timeToStart.set(Calendar.HOUR_OF_DAY, properties.earliestAlarmAt.hour)
             timeToStart.set(Calendar.MINUTE, properties.earliestAlarmAt.minute)
-            timeToStart.add(Calendar.DAY_OF_MONTH, 1)
+            if (properties.earliestAlarmAt.isEarlierThanOrSameTo(TimeOfDayModel.timeOfDayNow())) {
+                timeToStart.add(Calendar.DAY_OF_MONTH, 1)
+            }
             val delay = timeToStart.timeInMillis - System.currentTimeMillis()
             setUpAlarmScheduler(properties, delay)
         }

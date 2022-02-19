@@ -17,25 +17,36 @@ class ScheduleAlarmsDelegate(
     private val context: Context,
     private val alarmProperties: AlarmSchedulerPropertiesModel
 ) {
+    private lateinit var uri: Uri
+    private lateinit var alarmManager: AlarmManager
 
     fun scheduleAlarms() {
+        alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        val prefSettings = context.getSharedPreferences(
+            PreferenceDefinitions.preferencesName,
+            Context.MODE_PRIVATE
+        )
+        uri = Uri.parse(prefSettings.getString(PreferenceDefinitions.logFileUri, ""))
         alarmProperties.getAlarmIntervals().forEachIndexed { index, interval ->
-            setUpAlarm(context, interval, index)
+            if (timeInBoundaries(alarmProperties, interval)) {
+                WriteFileDelegate(context).appendToFile(uri, "$interval - ")
+                setUpAlarm(context, interval, index)
+            }
         }
     }
 
-    private fun setUpAlarm(context: Context, triggerAtMillis: Long, index: Int) {
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    private fun setUpAlarm(context: Context, triggerAfterMillis: Long, index: Int) {
         val alarmIntent = Intent(context, RingAlarmReceiver::class.java).let { intent ->
             PendingIntent.getBroadcast(context, index, intent, 0)
         }
-        val triggerAt = SystemClock.elapsedRealtime() + triggerAtMillis
+        val triggerAt = SystemClock.elapsedRealtime() + triggerAfterMillis
         alarmManager.setExact(
             AlarmManager.ELAPSED_REALTIME,
             triggerAt,
             alarmIntent
         )
-        logAlarmTime(context, triggerAtMillis)
+        logAlarmTime(context, triggerAfterMillis)
     }
 
     private fun logAlarmTime(context: Context, triggerAt: Long) {
@@ -45,11 +56,15 @@ class ScheduleAlarmsDelegate(
             triggerDate.get(Calendar.HOUR_OF_DAY),
             triggerDate.get(Calendar.MINUTE))
         val content = "Alarm scheduled for $triggerTimeOfDay\n"
-        val prefSettings = context.getSharedPreferences(
-            PreferenceDefinitions.preferencesName,
-            Context.MODE_PRIVATE
-        )
-        val uri = Uri.parse(prefSettings.getString(PreferenceDefinitions.logFileUri, ""))
         WriteFileDelegate(context).appendToFile(uri, content)
+    }
+
+    private fun timeInBoundaries(alarmSchedulerProperties: AlarmSchedulerPropertiesModel, triggerAfterMillis: Long): Boolean {
+        val triggerDate = Calendar.getInstance()
+        triggerDate.timeInMillis = System.currentTimeMillis() + triggerAfterMillis
+        val triggerTimeOfDay = TimeOfDayModel(
+            triggerDate.get(Calendar.HOUR_OF_DAY),
+            triggerDate.get(Calendar.MINUTE))
+        return triggerTimeOfDay.isBetweenAlarms(alarmSchedulerProperties)
     }
 }

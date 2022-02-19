@@ -1,5 +1,6 @@
 package com.joyfulDonkey.headlessreminder.models.alarm
 
+import com.joyfulDonkey.headlessreminder.components.files.delegates.WriteFileDelegate
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.collections.ArrayList
@@ -38,45 +39,43 @@ data class AlarmSchedulerPropertiesModel(
 
         val intervalsList = arrayListOf<Long>()
         intervalsList.add(firstAlarmDelay + generateFirstInterval(
-            evenDistributionMs,
-            firstAlarmDelay
-        )
+                evenDistributionMs,
+                firstAlarmDelay
+            )
         )
         for (i in 1 until this.numberOfAlarms) {
+            val interval = firstAlarmDelay +
+                    ((i + 0.5) * evenDistributionMs +
+                            (evenDistributionMs * generateRandomSalt())).toLong()
             intervalsList.add(
-                firstAlarmDelay +
-                        ((i + 0.5) * evenDistributionMs +
-                                (evenDistributionMs * generateRandomSalt(
-                                    SALT_PERCENTAGE
-                                ))).toLong()
+                interval
             )
         }
         return intervalsList
     }
 
-    fun isBetweenAlarms(): Boolean {
-        val timeOfDayNow = TimeOfDayModel.timeOfDayNow()
-        val startTimePassed = this.earliestAlarmAt.isEarlierThanOrSameTo(timeOfDayNow)
-        val endTimePassed = this.latestAlarmAt.isEarlierThanOrSameTo(timeOfDayNow)
-
-        return if (this.earliestAlarmAt.isEarlierThanOrSameTo(this.latestAlarmAt)) {
-            startTimePassed && !endTimePassed
-        } else {
-            // case when end time is on the next day
-            if (timeOfDayNow.isEarlierThanOrSameTo(TimeOfDayModel(23, 59))) {
-                startTimePassed
-            } else {
-                !endTimePassed
-            }
-        }
-    }
+//    fun isBetweenAlarms(timeOfDay: TimeOfDayModel): Boolean {
+//        val startTimePassed = this.earliestAlarmAt.isEarlierThanOrSameTo(timeOfDay)
+//        val endTimePassed = this.latestAlarmAt.isEarlierThanOrSameTo(timeOfDay)
+//
+//        return if (this.earliestAlarmAt.isEarlierThanOrSameTo(this.latestAlarmAt)) {
+//            startTimePassed && !endTimePassed
+//        } else {
+//            // case when end time is on the next day
+//            if (timeOfDay.isEarlierThanOrSameTo(TimeOfDayModel(23, 59))) {
+//                startTimePassed
+//            } else {
+//                !endTimePassed
+//            }
+//        }
+//    }
 
     /* Here we need to find out if alarms should be activated right now or the next day.
      * To do this we need to find out if we are between the selected start and end time.
      * If we are, start right away. If we are not, start on the next start time.
      */
     private fun calculateFirstAlarmDelay(): Long {
-        val betweenAlarms = isBetweenAlarms()
+        val betweenAlarms = TimeOfDayModel.timeOfDayNow().isBetweenAlarms(this)
         if (betweenAlarms) {
             return 0
         }
@@ -108,8 +107,8 @@ data class AlarmSchedulerPropertiesModel(
         return (calendarEndTime.timeInMillis - calendarStartTime.timeInMillis) / this.numberOfAlarms
     }
 
-    private fun generateRandomSalt(salt: Double): Double {
-        return ThreadLocalRandom.current().nextDouble(-salt, salt)
+    private fun generateRandomSalt(): Double {
+        return ThreadLocalRandom.current().nextDouble(-SALT_PERCENTAGE, SALT_PERCENTAGE)
     }
 
     private fun generateFirstInterval(evenDistribution: Long, firstAlarmDelay: Long): Long {
