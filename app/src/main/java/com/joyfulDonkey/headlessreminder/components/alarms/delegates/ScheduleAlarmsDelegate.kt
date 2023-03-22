@@ -38,7 +38,7 @@ class ScheduleAlarmsDelegate(
 
     private fun setUpAlarm(context: Context, triggerAfterMillis: Long, index: Int) {
         val alarmIntent = Intent(context, RingAlarmReceiver::class.java).let { intent ->
-            PendingIntent.getBroadcast(context, index, intent, 0)
+            PendingIntent.getBroadcast(context, index, intent, PendingIntent.FLAG_IMMUTABLE)
         }
         val triggerAt = SystemClock.elapsedRealtime() + triggerAfterMillis
         alarmManager.setExact(

@@ -23,9 +23,10 @@ class ScheduleAlarmsReceiver: BroadcastReceiver() {
         ) ?: return
         val alarmProperties = AlarmSchedulerPropertiesModel(
             prefSettings.getInt(PreferenceDefinitions.numOfAlarms, 5),
-            TimeOfDayModel(prefSettings.getInt(PreferenceDefinitions.hour,0),prefSettings.getInt(PreferenceDefinitions.minute, 0)),
-            TimeOfDayModel(prefSettings.getInt(PreferenceDefinitions.endHour,0),prefSettings.getInt(PreferenceDefinitions.endMinute, 0))
+            TimeOfDayModel(prefSettings.getInt(PreferenceDefinitions.hour,0), prefSettings.getInt(PreferenceDefinitions.minute, 0)),
+            TimeOfDayModel(prefSettings.getInt(PreferenceDefinitions.endHour,0), prefSettings.getInt(PreferenceDefinitions.endMinute, 0))
         )
+        //why do we need to reschedule ourselves everyday?
         scheduleSelf(context, alarmProperties)
         ScheduleAlarmsDelegate(context, alarmProperties).scheduleAlarms()
     }
@@ -39,7 +40,7 @@ class ScheduleAlarmsReceiver: BroadcastReceiver() {
 
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val alarmIntent = Intent(context, ScheduleAlarmsReceiver::class.java).let { intent ->
-            PendingIntent.getBroadcast(context, 0, intent, 0)
+            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         }
 
         val delay = timeToStart.timeInMillis - System.currentTimeMillis()

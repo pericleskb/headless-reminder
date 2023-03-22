@@ -28,7 +28,6 @@ class SelectTimeFragment: Fragment() {
 
     private lateinit var binding: FragmentDashboardBinding
     private lateinit var dashboardViewModel: DashboardViewModel
-
     /*****************************************************
      * No arguments here but following this practice everywhere
      * https://stackoverflow.com/questions/9245408/best-practice-for-instantiating-a-new-android-fragment
@@ -50,12 +49,12 @@ class SelectTimeFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dashboardViewModel = ViewModelProvider(this)[DashboardViewModel::class.java]
         initResources()
         initLayout()
     }
 
     private fun initResources() {
-        dashboardViewModel = ViewModelProvider(this).get(DashboardViewModel::class.java)
         binding.numOfAlarmsPicker.minValue = 1
         binding.numOfAlarmsPicker.maxValue = 10
         binding.numOfAlarmsPicker.wrapSelectorWheel = false
@@ -67,39 +66,15 @@ class SelectTimeFragment: Fragment() {
     private fun initLayout() {
         //set up save button functionality
         binding.scheduleAlarmsButton.setOnClickListener {
-            setUpAlarms(dashboardViewModel.getAlarmProperties())
+            setUpAlarms()
             dashboardViewModel.storePreferences()
         }
 
-        //start time timer
-        val startTimeDialog = TimePickerDialog(
-            context,
-            { _, hourOfDay, minute ->
-                val newTime = TimeOfDayModel(hourOfDay, minute)
-                dashboardViewModel.updateStartTime(newTime)
-                binding.startTimeSelector.text = newTime.toString()
-            },
-            dashboardViewModel.getAlarmProperties().earliestAlarmAt.hour,
-            dashboardViewModel.getAlarmProperties().earliestAlarmAt.minute,
-            true
-        )
         startTimeDialog.setTitle(getString(R.string.select_start_time))
         binding.startTimeSelector.setOnClickListener {
             startTimeDialog.show()
         }
 
-        //end time timer
-        val endTimeDialog = TimePickerDialog(
-            context,
-            { _, hourOfDay, minute ->
-                val newTime = TimeOfDayModel(hourOfDay, minute)
-                dashboardViewModel.updateEndTime(newTime)
-                binding.endTimeSelector.text = newTime.toString()
-            },
-            dashboardViewModel.getAlarmProperties().latestAlarmAt.hour,
-            dashboardViewModel.getAlarmProperties().latestAlarmAt.minute,
-            true
-        )
         endTimeDialog.setTitle(getString(R.string.select_end_time))
         binding.endTimeSelector.setOnClickListener {
             endTimeDialog.show()
@@ -116,19 +91,13 @@ class SelectTimeFragment: Fragment() {
         }
     }
 
-    private fun setUpAlarms(properties: AlarmSchedulerPropertiesModel) {
+    private fun setUpAlarms() {
+        val properties = dashboardViewModel.getAlarmProperties()
         if (TimeOfDayModel.timeOfDayNow().isBetweenAlarms(properties)) {
             val intent = Intent(context, ScheduleAlarmsReceiver::class.java)
             activity?.sendBroadcast(intent)
         } else {
-            val timeToStart = Calendar.getInstance()
-            timeToStart.set(Calendar.HOUR_OF_DAY, properties.earliestAlarmAt.hour)
-            timeToStart.set(Calendar.MINUTE, properties.earliestAlarmAt.minute)
-            if (properties.earliestAlarmAt.isEarlierThanOrSameTo(TimeOfDayModel.timeOfDayNow())) {
-                timeToStart.add(Calendar.DAY_OF_MONTH, 1)
-            }
-            val delay = timeToStart.timeInMillis - System.currentTimeMillis()
-            setUpAlarmScheduler(properties, delay)
+            setUpAlarmScheduler(properties, dashboardViewModel.getDelayForNextDay())
         }
     }
 
@@ -136,7 +105,7 @@ class SelectTimeFragment: Fragment() {
         assert(properties.earliestAlarmAt.hour in 0..23 && properties.earliestAlarmAt.minute in 0..59)
         val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val alarmIntent = Intent(context, ScheduleAlarmsReceiver::class.java).let { intent ->
-            PendingIntent.getBroadcast(context, 0, intent, 0)
+            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         }
         alarmManager.setExact(
             AlarmManager.ELAPSED_REALTIME,
@@ -149,6 +118,34 @@ class SelectTimeFragment: Fragment() {
 //            timeToStart.get(Calendar.HOUR_OF_DAY),
 //            timeToStart.get(Calendar.MINUTE))
 //        val content = "Time now = ${TimeOfDayModel.timeOfDayNow()} - Next schedule time: $triggerTimeOfDay ${timeToStart.get(Calendar.DAY_OF_MONTH)}\\${timeToStart.get(Calendar.MONTH) + 1} \n"
+    }
+
+    private val startTimeDialog by lazy {
+        TimePickerDialog(
+            context,
+            { _, hourOfDay, minute ->
+                val newTime = TimeOfDayModel(hourOfDay, minute)
+                dashboardViewModel.updateStartTime(newTime)
+                binding.startTimeSelector.text = newTime.toString()
+            },
+            dashboardViewModel.getAlarmProperties().earliestAlarmAt.hour,
+            dashboardViewModel.getAlarmProperties().earliestAlarmAt.minute,
+            true
+        )
+    }
+
+    private val endTimeDialog by lazy {
+        TimePickerDialog(
+            context,
+            { _, hourOfDay, minute ->
+                val newTime = TimeOfDayModel(hourOfDay, minute)
+                dashboardViewModel.updateEndTime(newTime)
+                binding.endTimeSelector.text = newTime.toString()
+            },
+            dashboardViewModel.getAlarmProperties().latestAlarmAt.hour,
+            dashboardViewModel.getAlarmProperties().latestAlarmAt.minute,
+            true
+        )
     }
 
     private fun startFileSelectionActivity() {
@@ -179,5 +176,4 @@ class SelectTimeFragment: Fragment() {
 
         }
     }
-
 }

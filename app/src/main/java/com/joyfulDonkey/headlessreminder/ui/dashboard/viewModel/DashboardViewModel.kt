@@ -17,14 +17,17 @@ import java.util.*
  */
 class DashboardViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val prefSettings: SharedPreferences = getApplication<Application>().getSharedPreferences(
+    private val prefSettings: SharedPreferences = application.getSharedPreferences(
         PreferenceDefinitions.preferencesName,
         Context.MODE_PRIVATE
     )
+
     private val now = Calendar.getInstance()
+
+    //If values have been stored, restore them, else show current time we got from now
     private var alarmProperties: AlarmSchedulerPropertiesModel = AlarmSchedulerPropertiesModel(
         prefSettings.getInt(PreferenceDefinitions.numOfAlarms, 5),
-        TimeOfDayModel(prefSettings.getInt(PreferenceDefinitions.hour,now.get(Calendar.HOUR_OF_DAY)),prefSettings.getInt(PreferenceDefinitions.minute, now.get(Calendar.MINUTE))),
+        TimeOfDayModel(prefSettings.getInt(PreferenceDefinitions.hour,now.get(Calendar.HOUR_OF_DAY)), prefSettings.getInt(PreferenceDefinitions.minute, now.get(Calendar.MINUTE))),
         TimeOfDayModel(prefSettings.getInt(PreferenceDefinitions.endHour,0),prefSettings.getInt(PreferenceDefinitions.endMinute, 0))
     )
 
@@ -58,5 +61,15 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
         val prefsEditor = prefSettings.edit()
         prefsEditor.putString(PreferenceDefinitions.logFileUri, logFileUri)
         prefsEditor?.apply()
+    }
+
+    fun getDelayForNextDay(): Long {
+        val timeToStart = Calendar.getInstance()
+        timeToStart.set(Calendar.HOUR_OF_DAY, alarmProperties.earliestAlarmAt.hour)
+        timeToStart.set(Calendar.MINUTE, alarmProperties.earliestAlarmAt.minute)
+        if (alarmProperties.earliestAlarmAt.isEarlierThanOrSameTo(TimeOfDayModel.timeOfDayNow())) {
+            timeToStart.add(Calendar.DAY_OF_MONTH, 1)
+        }
+        return timeToStart.timeInMillis - System.currentTimeMillis()
     }
 }
