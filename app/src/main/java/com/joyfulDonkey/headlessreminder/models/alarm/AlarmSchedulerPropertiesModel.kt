@@ -1,6 +1,5 @@
 package com.joyfulDonkey.headlessreminder.models.alarm
 
-import com.joyfulDonkey.headlessreminder.components.files.delegates.WriteFileDelegate
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.collections.ArrayList
@@ -19,20 +18,16 @@ import kotlin.collections.ArrayList
  **********************************************************************/
 data class AlarmSchedulerPropertiesModel(
     var numberOfAlarms: Int,
-    //TODO set to current time and midnight if not set
-    var earliestAlarmAt: TimeOfDayModel = TimeOfDayModel(18,0),
-    var latestAlarmAt: TimeOfDayModel = TimeOfDayModel(18, 15)
+    var earliestAlarmAt: TimeOfDayModel,
+    var latestAlarmAt: TimeOfDayModel
 ) {
     companion object {
-        const val SECOND_IN_MS = 1000L
-        const val MINUTE_IN_MS = 60 * SECOND_IN_MS
-        const val HOUR_IN_MS = 60 * MINUTE_IN_MS
+        private const val SECOND_IN_MS = 1000L
         const val SALT_PERCENTAGE = 0.33
         //    const val START_NOW_OFFSET = (MINUTE_IN_MS * 2) TODO causes crashes on sort windows
         const val START_NOW_OFFSET = (SECOND_IN_MS * 10)
     }
 
-    //TODO bug. When between alarms alarms will be set even after end time
     fun getAlarmIntervals(): ArrayList<Long> {
         val firstAlarmDelay = calculateFirstAlarmDelay()
         val evenDistributionMs = calculateEvenDistributionMs()
@@ -97,7 +92,6 @@ data class AlarmSchedulerPropertiesModel(
 
     private fun generateFirstInterval(evenDistribution: Long, firstAlarmDelay: Long): Long {
         val minValue = if (firstAlarmDelay == 0L) START_NOW_OFFSET else 0
-        //TODO minValue > bound if too many alarms in too short a time
         return ThreadLocalRandom.current().nextLong(minValue, (0.83 * evenDistribution).toLong())
     }
 }
