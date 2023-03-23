@@ -14,8 +14,7 @@ import com.joyfulDonkey.headlessreminder.components.files.delegates.WriteFileDel
 import java.util.*
 
 class ScheduleAlarmsDelegate(
-    private val context: Context,
-    private val alarmProperties: AlarmSchedulerPropertiesModel
+    private val context: Context
 ) {
     private lateinit var uri: Uri
     private lateinit var alarmManager: AlarmManager
@@ -27,6 +26,15 @@ class ScheduleAlarmsDelegate(
             PreferenceDefinitions.preferencesName,
             Context.MODE_PRIVATE
         )
+
+        val alarmProperties = AlarmSchedulerPropertiesModel(
+            prefSettings.getInt(PreferenceDefinitions.numOfAlarms, 5),
+            TimeOfDayModel(prefSettings.getInt(PreferenceDefinitions.hour,0), prefSettings.getInt(
+                PreferenceDefinitions.minute, 0)),
+            TimeOfDayModel(prefSettings.getInt(PreferenceDefinitions.endHour,0), prefSettings.getInt(
+                PreferenceDefinitions.endMinute, 0))
+        )
+
         uri = Uri.parse(prefSettings.getString(PreferenceDefinitions.logFileUri, ""))
         alarmProperties.getAlarmIntervals().forEachIndexed { index, interval ->
             if (timeInBoundaries(alarmProperties, interval)) {
@@ -41,6 +49,7 @@ class ScheduleAlarmsDelegate(
             PendingIntent.getBroadcast(context, index, intent, PendingIntent.FLAG_IMMUTABLE)
         }
         val triggerAt = SystemClock.elapsedRealtime() + triggerAfterMillis
+        //TODO consider using setWindow() instead of setExact to reduce resources consumption
         alarmManager.setExact(
             AlarmManager.ELAPSED_REALTIME,
             triggerAt,

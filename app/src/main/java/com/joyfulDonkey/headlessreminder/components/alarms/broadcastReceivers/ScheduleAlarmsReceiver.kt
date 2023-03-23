@@ -16,22 +16,14 @@ import java.util.*
 
 class ScheduleAlarmsReceiver: BroadcastReceiver() {
 
-    override fun onReceive(context: Context?, intent: Intent?) {
-        val prefSettings = context?.getSharedPreferences(
-            PreferenceDefinitions.preferencesName,
-            Context.MODE_PRIVATE
-        ) ?: return
-        val alarmProperties = AlarmSchedulerPropertiesModel(
-            prefSettings.getInt(PreferenceDefinitions.numOfAlarms, 5),
-            TimeOfDayModel(prefSettings.getInt(PreferenceDefinitions.hour,0), prefSettings.getInt(PreferenceDefinitions.minute, 0)),
-            TimeOfDayModel(prefSettings.getInt(PreferenceDefinitions.endHour,0), prefSettings.getInt(PreferenceDefinitions.endMinute, 0))
-        )
+    override fun onReceive(context: Context, intent: Intent?) {
         //why do we need to reschedule ourselves everyday?
-        scheduleSelf(context, alarmProperties)
-        ScheduleAlarmsDelegate(context, alarmProperties).scheduleAlarms()
+        scheduleSelf(context)
+        ScheduleAlarmsDelegate(context).scheduleAlarms()
     }
 
-    private fun scheduleSelf(context: Context, alarmProperties: AlarmSchedulerPropertiesModel) {
+    private fun scheduleSelf(context: Context) {
+        val alarmProperties = getAlarmProperties(context)
 
         val timeToStart = Calendar.getInstance()
         timeToStart.set(Calendar.HOUR_OF_DAY, alarmProperties.earliestAlarmAt.hour)
@@ -51,6 +43,19 @@ class ScheduleAlarmsReceiver: BroadcastReceiver() {
             alarmIntent
         )
         logNextScheduleTime(context, timeToStart)
+    }
+
+    private fun getAlarmProperties(context: Context): AlarmSchedulerPropertiesModel {
+        val prefSettings = context.getSharedPreferences(
+            PreferenceDefinitions.preferencesName,
+            Context.MODE_PRIVATE
+        )
+
+        return AlarmSchedulerPropertiesModel(
+            prefSettings.getInt(PreferenceDefinitions.numOfAlarms, 5),
+            TimeOfDayModel(prefSettings.getInt(PreferenceDefinitions.hour,0), prefSettings.getInt(PreferenceDefinitions.minute, 0)),
+            TimeOfDayModel(prefSettings.getInt(PreferenceDefinitions.endHour,0), prefSettings.getInt(PreferenceDefinitions.endMinute, 0))
+        )
     }
 
     private fun logNextScheduleTime(context: Context, timeToStart: Calendar) {
